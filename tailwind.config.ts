@@ -1,3 +1,4 @@
+import { COLORS } from "./src/utils/colors";
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -11,6 +12,8 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primary: COLORS.PRIMARY,
+        heading: COLORS.HEADING,
       },
     },
   },
