@@ -1,5 +1,5 @@
 import { poppins } from "@/utils/fonts";
-import { Button, Drawer, Form, Input } from "antd";
+import { Button, Drawer, Form, FormProps, Input } from "antd";
 import { Dispatch, SetStateAction } from "react";
 import { Icon } from "@iconify/react";
 
@@ -20,6 +20,13 @@ export default function UserManagementEditUsername({
     onClose();
     setOpen(false);
   };
+
+  const handleEditUsernameForm: FormProps<UserManagementEditUsernameType>["onFinish"] =
+    (values) => {
+      const { username } = values;
+
+      // TODO: Update user in backend
+    };
 
   return (
     <Drawer
@@ -52,11 +59,9 @@ export default function UserManagementEditUsername({
         </span>
       </div>
 
-      {/* TODO: Add validation */}
       <Form
         name="User Account Create"
-        // onFinish={() => {}}  TODO: on finish
-        // onFinishFailed={onFinishFailed}  TODO: on finish failed
+        onFinish={handleEditUsernameForm}
         initialValues={{ remember: true }}
         autoComplete="off"
         className="px-8 py-4"

@@ -1,16 +1,19 @@
 "use client";
 import { poppins } from "@/utils/fonts";
 import { Button, Drawer, Form, FormProps, Input, Modal, Select } from "antd";
-import PhoneInput from "antd-phone-input";
+import PhoneInput, { PhoneNumber } from "antd-phone-input";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Icon } from "@iconify/react";
+import { toast } from "react-toastify";
+import { ApiCall } from "@/lib/api";
 
 type UserAccountCreateFieldType = {
   role: string;
   username: string;
-  phone: number;
   password: string;
   confirmPassword: string;
+  phone: number;
+  email: string;
   city: string;
 };
 
@@ -32,10 +35,47 @@ export default function UserManagementCreateAccount({
   };
 
   const handleCreateAccountForm: FormProps<UserAccountCreateFieldType>["onFinish"] =
-    (values) => {
-      // TODO: Backend Service connection\
-      // On success
-      console.log(values);
+    async (values) => {
+      const { city, confirmPassword, email, password, role, username } = values;
+      const phoneDetails: {
+        areaCode: string;
+        countryCode: number;
+        isoCode: string;
+        phoneNumber: string;
+      } = values.phone as any;
+
+      const phoneNumber = `${phoneDetails.areaCode}${phoneDetails.phoneNumber}`;
+
+      if (confirmPassword != password) {
+        toast.error("Password do not match");
+        return;
+      }
+
+      const response = await ApiCall({
+        query: `mutation ($addUserDto: AddUserDto!) {
+  addUser(addUserDto: $addUserDto) {
+    id
+  }
+}`,
+        veriables: {
+          addUserDto: {
+            city,
+            email,
+            password,
+            phone_number: Number(phoneNumber),
+            username,
+          },
+        },
+      });
+
+      // check for error
+      if (response.status == false) {
+        toast.error(response.message);
+        return;
+      }
+
+      const newUserId: string = response.data?.addUser?.id ?? "Unknown Id";
+      toast.success("Successfully created User with id: " + newUserId);
       setModalOpen(true);
     };
 
@@ -61,7 +101,6 @@ export default function UserManagementCreateAccount({
       <Form
         name="User Account Create"
         onFinish={handleCreateAccountForm}
-        // onFinishFailed={onFinishFailed}  TODO: on finish failed
         form={form}
         initialValues={{ remember: true }}
         autoComplete="off"
@@ -86,21 +125,6 @@ export default function UserManagementCreateAccount({
           rules={[{ required: true, message: "Please input your username!" }]}
         >
           <Input placeholder="Username" />
-        </Form.Item>
-        <Form.Item<UserAccountCreateFieldType>
-          label=""
-          name="phone"
-          rules={[
-            {
-              validator: (_, { valid }) => {
-                if (valid(true)) return Promise.resolve(); // strict validation
-                // if (valid()) return Promise.resolve(); // non-strict validation
-                return Promise.reject("Invalid phone number");
-              },
-            },
-          ]}
-        >
-          <PhoneInput enableSearch placeholder="Phone Number" />
         </Form.Item>
         <Form.Item<UserAccountCreateFieldType>
           name="password"
@@ -130,6 +154,47 @@ export default function UserManagementCreateAccount({
           hasFeedback
         >
           <Input.Password placeholder="Confirm Password" />
+        </Form.Item>
+        <Form.Item<UserAccountCreateFieldType>
+          label=""
+          name="email"
+          rules={[
+            {
+              required: true,
+              message: "Email is required",
+            },
+            {
+              type: "email",
+              message: "Please enter a valid email address",
+            },
+            {
+              validator: (_, value) => {
+                const emailRegEx =
+                  /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+                if (!value || emailRegEx.test(value)) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("Invalid email address");
+              },
+            },
+          ]}
+        >
+          <Input placeholder="Email" />
+        </Form.Item>
+        <Form.Item<UserAccountCreateFieldType>
+          label=""
+          name="phone"
+          rules={[
+            {
+              validator: (_, { valid }) => {
+                if (valid(true)) return Promise.resolve(); // strict validation
+                // if (valid()) return Promise.resolve(); // non-strict validation
+                return Promise.reject("Invalid phone number");
+              },
+            },
+          ]}
+        >
+          <PhoneInput enableSearch placeholder="Phone Number" />
         </Form.Item>
         <Form.Item<UserAccountCreateFieldType>
           name="city"

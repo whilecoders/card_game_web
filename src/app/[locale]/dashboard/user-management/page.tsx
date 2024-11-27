@@ -17,426 +17,74 @@ import {
 } from "antd";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { ApiCall } from "@/lib/api";
+import { toast } from "react-toastify";
+import { formateDate } from "@/lib/methods";
 
 interface UserDataType {
-  key: string | number; // TODO: remove number according to requirement
+  id: string | number; // TODO: remove number according to requirement
   username: string;
   role: string;
-  token: number;
-  joinDate: string;
-  phoneNumber: string;
+  wallet: number;
+  createdAt: string;
+  phone_number: string;
 }
-
-const userData: UserDataType[] = [
-  {
-    key: 0,
-    username: "CleverLion916",
-    role: "User",
-    token: 0,
-    joinDate: "2015-11-17",
-    phoneNumber: "695-728-0877",
-  },
-  {
-    key: 1,
-    username: "CleverTiger371",
-    role: "Admin",
-    token: 1,
-    joinDate: "2019-06-01",
-    phoneNumber: "445-253-1246",
-  },
-  {
-    key: 2,
-    username: "BraveTiger852",
-    role: "Guest",
-    token: 2,
-    joinDate: "2011-03-07",
-    phoneNumber: "702-292-3895",
-  },
-  {
-    key: 3,
-    username: "CleverLion230",
-    role: "User",
-    token: 3,
-    joinDate: "2014-10-10",
-    phoneNumber: "893-303-5369",
-  },
-  {
-    key: 4,
-    username: "FastPhoenix768",
-    role: "Admin",
-    token: 4,
-    joinDate: "2014-08-21",
-    phoneNumber: "635-987-6903",
-  },
-  {
-    key: 5,
-    username: "FastTiger598",
-    role: "Admin",
-    token: 5,
-    joinDate: "2012-07-06",
-    phoneNumber: "556-500-0523",
-  },
-  {
-    key: 6,
-    username: "CleverEagle828",
-    role: "Moderator",
-    token: 6,
-    joinDate: "2021-01-21",
-    phoneNumber: "835-630-5869",
-  },
-  {
-    key: 7,
-    username: "HappyLion983",
-    role: "Admin",
-    token: 7,
-    joinDate: "2012-02-08",
-    phoneNumber: "590-812-4349",
-  },
-  {
-    key: 8,
-    username: "WiseShark644",
-    role: "Guest",
-    token: 8,
-    joinDate: "2013-12-14",
-    phoneNumber: "448-101-5862",
-  },
-  {
-    key: 9,
-    username: "HappyDragon469",
-    role: "User",
-    token: 9,
-    joinDate: "2023-08-31",
-    phoneNumber: "668-690-1310",
-  },
-  {
-    key: 10,
-    username: "BraveTiger137",
-    role: "Admin",
-    token: 10,
-    joinDate: "2010-12-17",
-    phoneNumber: "515-306-5494",
-  },
-  {
-    key: 11,
-    username: "BraveEagle503",
-    role: "Admin",
-    token: 11,
-    joinDate: "2011-10-17",
-    phoneNumber: "474-195-9069",
-  },
-  {
-    key: 12,
-    username: "HappyShark29",
-    role: "Guest",
-    token: 12,
-    joinDate: "2010-07-20",
-    phoneNumber: "660-468-8957",
-  },
-  {
-    key: 13,
-    username: "BraveTiger542",
-    role: "Moderator",
-    token: 13,
-    joinDate: "2015-07-24",
-    phoneNumber: "708-552-8207",
-  },
-  {
-    key: 14,
-    username: "HappyPhoenix922",
-    role: "User",
-    token: 14,
-    joinDate: "2014-10-09",
-    phoneNumber: "516-348-9336",
-  },
-  {
-    key: 15,
-    username: "WiseEagle17",
-    role: "Guest",
-    token: 15,
-    joinDate: "2024-10-27",
-    phoneNumber: "515-222-9567",
-  },
-  {
-    key: 16,
-    username: "WisePhoenix781",
-    role: "Admin",
-    token: 16,
-    joinDate: "2013-06-22",
-    phoneNumber: "167-845-8149",
-  },
-  {
-    key: 17,
-    username: "StrongDragon53",
-    role: "Moderator",
-    token: 17,
-    joinDate: "2014-11-08",
-    phoneNumber: "961-951-3849",
-  },
-  {
-    key: 18,
-    username: "WiseLion920",
-    role: "Guest",
-    token: 18,
-    joinDate: "2021-04-05",
-    phoneNumber: "598-576-8304",
-  },
-  {
-    key: 19,
-    username: "CleverPhoenix966",
-    role: "Admin",
-    token: 19,
-    joinDate: "2022-08-05",
-    phoneNumber: "838-579-6290",
-  },
-  {
-    key: 20,
-    username: "CleverDragon790",
-    role: "Admin",
-    token: 20,
-    joinDate: "2021-09-02",
-    phoneNumber: "416-360-2978",
-  },
-  {
-    key: 21,
-    username: "FastTiger801",
-    role: "Admin",
-    token: 21,
-    joinDate: "2022-08-31",
-    phoneNumber: "183-167-6735",
-  },
-  {
-    key: 22,
-    username: "StrongShark755",
-    role: "User",
-    token: 22,
-    joinDate: "2015-11-30",
-    phoneNumber: "828-992-4925",
-  },
-  {
-    key: 23,
-    username: "StrongLion5",
-    role: "Admin",
-    token: 23,
-    joinDate: "2010-10-31",
-    phoneNumber: "390-691-4381",
-  },
-  {
-    key: 24,
-    username: "FastEagle233",
-    role: "Guest",
-    token: 24,
-    joinDate: "2013-07-18",
-    phoneNumber: "134-712-3670",
-  },
-  {
-    key: 25,
-    username: "BraveLion148",
-    role: "Admin",
-    token: 25,
-    joinDate: "2012-07-12",
-    phoneNumber: "132-875-7061",
-  },
-  {
-    key: 26,
-    username: "HappyDragon394",
-    role: "Admin",
-    token: 26,
-    joinDate: "2014-03-09",
-    phoneNumber: "721-566-6683",
-  },
-  {
-    key: 27,
-    username: "CleverShark141",
-    role: "Admin",
-    token: 27,
-    joinDate: "2015-02-18",
-    phoneNumber: "912-464-3357",
-  },
-  {
-    key: 28,
-    username: "FastPhoenix431",
-    role: "User",
-    token: 28,
-    joinDate: "2024-03-30",
-    phoneNumber: "640-169-9077",
-  },
-  {
-    key: 29,
-    username: "FastTiger637",
-    role: "User",
-    token: 29,
-    joinDate: "2023-08-24",
-    phoneNumber: "695-970-0786",
-  },
-  {
-    key: 30,
-    username: "HappyPhoenix822",
-    role: "User",
-    token: 30,
-    joinDate: "2011-10-09",
-    phoneNumber: "626-113-8845",
-  },
-  {
-    key: 31,
-    username: "FastEagle80",
-    role: "Admin",
-    token: 31,
-    joinDate: "2013-12-19",
-    phoneNumber: "329-359-7422",
-  },
-  {
-    key: 32,
-    username: "StrongDragon173",
-    role: "Moderator",
-    token: 32,
-    joinDate: "2017-01-12",
-    phoneNumber: "652-875-5826",
-  },
-  {
-    key: 33,
-    username: "WiseTiger437",
-    role: "Moderator",
-    token: 33,
-    joinDate: "2021-03-05",
-    phoneNumber: "192-853-4738",
-  },
-  {
-    key: 34,
-    username: "WisePhoenix835",
-    role: "User",
-    token: 34,
-    joinDate: "2015-12-06",
-    phoneNumber: "976-290-2216",
-  },
-  {
-    key: 35,
-    username: "WiseLion188",
-    role: "Guest",
-    token: 35,
-    joinDate: "2018-04-21",
-    phoneNumber: "466-910-7721",
-  },
-  {
-    key: 36,
-    username: "StrongDragon843",
-    role: "Admin",
-    token: 36,
-    joinDate: "2010-05-17",
-    phoneNumber: "853-846-8617",
-  },
-  {
-    key: 37,
-    username: "BravePhoenix299",
-    role: "Admin",
-    token: 37,
-    joinDate: "2022-04-16",
-    phoneNumber: "101-571-8494",
-  },
-  {
-    key: 38,
-    username: "HappyTiger15",
-    role: "User",
-    token: 38,
-    joinDate: "2016-02-04",
-    phoneNumber: "676-850-3525",
-  },
-  {
-    key: 39,
-    username: "HappyEagle218",
-    role: "Moderator",
-    token: 39,
-    joinDate: "2017-05-11",
-    phoneNumber: "163-293-3730",
-  },
-  {
-    key: 40,
-    username: "FastShark195",
-    role: "Moderator",
-    token: 40,
-    joinDate: "2023-10-08",
-    phoneNumber: "289-871-1728",
-  },
-  {
-    key: 41,
-    username: "BraveLion135",
-    role: "User",
-    token: 41,
-    joinDate: "2011-02-17",
-    phoneNumber: "563-901-3446",
-  },
-  {
-    key: 42,
-    username: "FastPhoenix410",
-    role: "Moderator",
-    token: 42,
-    joinDate: "2019-07-03",
-    phoneNumber: "105-586-2393",
-  },
-  {
-    key: 43,
-    username: "WiseDragon189",
-    role: "Moderator",
-    token: 43,
-    joinDate: "2012-10-02",
-    phoneNumber: "991-305-5595",
-  },
-  {
-    key: 44,
-    username: "FastShark886",
-    role: "User",
-    token: 44,
-    joinDate: "2020-09-02",
-    phoneNumber: "353-222-9020",
-  },
-  {
-    key: 45,
-    username: "CleverPhoenix771",
-    role: "Guest",
-    token: 45,
-    joinDate: "2013-04-18",
-    phoneNumber: "413-709-1642",
-  },
-  {
-    key: 46,
-    username: "CleverEagle40",
-    role: "User",
-    token: 46,
-    joinDate: "2022-06-28",
-    phoneNumber: "571-581-5672",
-  },
-  {
-    key: 47,
-    username: "FastEagle216",
-    role: "Moderator",
-    token: 47,
-    joinDate: "2014-01-23",
-    phoneNumber: "466-881-8124",
-  },
-  {
-    key: 48,
-    username: "CleverDragon637",
-    role: "User",
-    token: 48,
-    joinDate: "2013-05-20",
-    phoneNumber: "175-609-5711",
-  },
-  {
-    key: 49,
-    username: "BravePhoenix205",
-    role: "Admin",
-    token: 49,
-    joinDate: "2015-03-12",
-    phoneNumber: "121-516-6826",
-  },
-];
 
 export default function Page() {
   const [accountCreateOpen, setAccountCreateOpen] = useState(false);
   const [accountManageOpen, setAccountManageOpen] = useState(false);
+  const [userData, setUserData] = useState<UserDataType[]>([]);
+  const [page, setPage] = useState(1);
+  const [count, setCount] = useState(0);
+
+  const perPageData = 10;
 
   const t = useTranslations("UserManagement");
 
-  console.log(t("Removeuser"));
+  // Fetch ALl Users
+  const userQuery = useQuery({
+    queryKey: ["GetAllUser", page],
+    queryFn: async () => {
+      const response = await ApiCall({
+        query: `query ($skip: Int!, $take: Int!) {
+    getAllUsers(skip: $skip, take: $take) {
+      count,
+      skip,
+      take,
+      data {
+        id,
+        username,
+        role,
+        wallet,
+        createdAt,
+        phone_number
+      }
+    }
+  }`,
+        veriables: {
+          skip: (page - 1) * perPageData,
+          take: perPageData,
+        },
+      });
+
+      if (!response.status) {
+        toast.error(response.message);
+        return [];
+      }
+      const apiData: {
+        count: number;
+        data: UserDataType[];
+        take: number;
+        skip: number;
+      } = response.data?.getAllUsers;
+
+      setCount(apiData.count);
+      setUserData(apiData?.data ?? []);
+
+      return apiData?.data ?? [];
+    },
+  });
 
   const items: MenuProps["items"] = [
     {
@@ -462,17 +110,21 @@ export default function Page() {
     },
     {
       title: "Token",
-      dataIndex: "token",
+      dataIndex: "wallet",
       render: (d) => <div onClick={() => setAccountManageOpen(true)}>{d}</div>,
     },
     {
       title: "Join Date",
-      dataIndex: "joinDate",
-      render: (d) => <div onClick={() => setAccountManageOpen(true)}>{d}</div>,
+      dataIndex: "createdAt",
+      render: (d) => (
+        <div onClick={() => setAccountManageOpen(true)}>
+          {formateDate(new Date(d))}
+        </div>
+      ),
     },
     {
       title: "Phone Number",
-      dataIndex: "phoneNumber",
+      dataIndex: "phone_number",
       render: (d) => <div onClick={() => setAccountManageOpen(true)}>{d}</div>,
     },
     {
@@ -546,7 +198,11 @@ export default function Page() {
           dataSource={userData}
           rowKey="username"
           pagination={{
-            pageSize: 8,
+            pageSize: perPageData,
+            total: count,
+            onChange: (page) => {
+              setPage(page);
+            },
           }}
         />
       </div>

@@ -12,6 +12,7 @@
     "@hookform/devtools": "^4.3.1",
     "@hookform/resolvers": "^3.9.1",
     "@iconify/react": "^5.0.2",
+    "@tanstack/react-query": "^5.61.3",
     "antd": "^5.21.6",
     "antd-phone-input": "^0.3.10",
     "axios": "^1.7.7",
