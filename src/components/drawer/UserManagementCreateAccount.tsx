@@ -64,6 +64,7 @@ export default function UserManagementCreateAccount({
             password,
             phone_number: Number(phoneNumber),
             username,
+            role: role,
           },
         },
       });
@@ -113,9 +114,10 @@ export default function UserManagementCreateAccount({
           <Select
             placeholder="Role"
             options={[
-              { value: "super_admin", label: "SUPER ADMIN" },
-              { value: "admin", label: "ADMIN" },
-              { value: "user", label: "USER" },
+              { value: "MASTER", label: "MASTER" },
+              { value: "SUPERADMIN", label: "SUPER ADMIN" },
+              { value: "ADMIN", label: "ADMIN" },
+              { value: "USER", label: "USER" },
             ]}
             className="border-transparent"
           />

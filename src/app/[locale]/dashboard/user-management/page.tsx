@@ -22,7 +22,7 @@ import { ApiCall } from "@/lib/api";
 import { toast } from "react-toastify";
 import { formateDate } from "@/lib/methods";
 
-interface UserDataType {
+export interface UserDataType {
   id: string | number; // TODO: remove number according to requirement
   username: string;
   role: string;
@@ -37,6 +37,7 @@ export default function Page() {
   const [userData, setUserData] = useState<UserDataType[]>([]);
   const [page, setPage] = useState(1);
   const [count, setCount] = useState(0);
+  const [selectedUser, setSelectedUser] = useState<undefined | UserDataType>();
 
   const perPageData = 10;
 
@@ -101,23 +102,55 @@ export default function Page() {
     {
       title: "Username",
       dataIndex: "username",
-      render: (d) => <div onClick={() => setAccountManageOpen(true)}>{d}</div>,
+      render: (d, user) => (
+        <div
+          onClick={() => {
+            setSelectedUser(user);
+            setAccountManageOpen(true);
+          }}
+        >
+          {d}
+        </div>
+      ),
     },
     {
       title: "Role",
       dataIndex: "role",
-      render: (d) => <div onClick={() => setAccountManageOpen(true)}>{d}</div>,
+      render: (d, user) => (
+        <div
+          onClick={() => {
+            setSelectedUser(user);
+            setAccountManageOpen(true);
+          }}
+        >
+          {d}
+        </div>
+      ),
     },
     {
       title: "Token",
       dataIndex: "wallet",
-      render: (d) => <div onClick={() => setAccountManageOpen(true)}>{d}</div>,
+      render: (d, user) => (
+        <div
+          onClick={() => {
+            setSelectedUser(user);
+            setAccountManageOpen(true);
+          }}
+        >
+          {d}
+        </div>
+      ),
     },
     {
       title: "Join Date",
       dataIndex: "createdAt",
-      render: (d) => (
-        <div onClick={() => setAccountManageOpen(true)}>
+      render: (d, user) => (
+        <div
+          onClick={() => {
+            setSelectedUser(user);
+            setAccountManageOpen(true);
+          }}
+        >
           {formateDate(new Date(d))}
         </div>
       ),
@@ -125,7 +158,16 @@ export default function Page() {
     {
       title: "Phone Number",
       dataIndex: "phone_number",
-      render: (d) => <div onClick={() => setAccountManageOpen(true)}>{d}</div>,
+      render: (d, user) => (
+        <div
+          onClick={() => {
+            setSelectedUser(user);
+            setAccountManageOpen(true);
+          }}
+        >
+          {d}
+        </div>
+      ),
     },
     {
       title: "",
@@ -215,6 +257,7 @@ export default function Page() {
       <UserManagementAccountDetails
         open={accountManageOpen}
         setOpen={setAccountManageOpen}
+        selectedUser={selectedUser}
       />
     </div>
   );
