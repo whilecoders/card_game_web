@@ -35,6 +35,7 @@ export default function DashboardMobileSidebar() {
                 className={`flex items-center gap-4 justify-center font-medium text-black hover:text-primary ${
                   isActive ? "text-primary" : ""
                 } ${poppins}`}
+                onClick={() => setOpen(false)}
               >
                 <span className="text-3xl">{item.icon}</span>
                 <span className="text-lg">{item.name}</span>

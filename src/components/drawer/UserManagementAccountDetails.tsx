@@ -15,7 +15,7 @@ export default function UserManagementAccountDetails({
   open: boolean;
   onClose?: () => void;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  selectedUser: UserDataType;
+  selectedUser: UserDataType | undefined;
 }) {
   const [accountEditUsername, setAccountEditUsername] = useState(false);
   const [accountManageUser, setAccountManageUser] = useState(false);
