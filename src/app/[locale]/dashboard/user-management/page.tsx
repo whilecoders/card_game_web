@@ -67,7 +67,7 @@ export default function Page() {
           take: perPageData,
         },
       });
-
+      
       if (!response.status) {
         toast.error(response.message);
         return [];
