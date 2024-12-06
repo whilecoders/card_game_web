@@ -2,6 +2,8 @@ import { poppins } from "@/utils/fonts";
 import { Button, Drawer, Form, FormProps, Input } from "antd";
 import { Dispatch, SetStateAction } from "react";
 import { Icon } from "@iconify/react";
+import { ApiCall } from "@/lib/api";
+import { toast } from "react-toastify";
 
 type UserManagementEditUsernameType = {
   username: string;
@@ -11,10 +13,12 @@ export default function UserManagementEditUsername({
   open,
   onClose = () => {},
   setOpen,
+  userId,
 }: {
   open: boolean;
   onClose?: () => void;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  userId: number;
 }) {
   const handleClose = () => {
     onClose();
@@ -22,10 +26,32 @@ export default function UserManagementEditUsername({
   };
 
   const handleEditUsernameForm: FormProps<UserManagementEditUsernameType>["onFinish"] =
-    (values) => {
+    async (values) => {
       const { username } = values;
 
-      // TODO: Update user in backend
+      const response = await ApiCall({
+        query: `mutation ($updateUserId: Int!, $updateUserDto: UpdateUserDto!) {
+  updateUser(id: $updateUserId, updateUserDto: $updateUserDto) {
+    username
+  }
+}`,
+        veriables: {
+          updateUserDto: {
+            username,
+          },
+          updateUserId: userId,
+        },
+      });
+
+      // check for error
+      if (response.status == false) {
+        toast.error(response.message);
+        return;
+      }
+
+      const newUserName: string =
+        response.data?.updateUser?.username ?? "Unknown Id";
+      toast.success("Successfully Updated usename to: " + newUserName);
     };
 
   return (

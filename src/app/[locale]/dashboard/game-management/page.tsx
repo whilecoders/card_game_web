@@ -5,6 +5,8 @@ import { Icon } from "@iconify/react";
 import { poppins } from "@/utils/fonts";
 import "./style.css";
 import GameStats from "@/components/ui/GameStats";
+import GameManagementCreateGame from "@/components/drawer/GameManagementCreateGame";
+import { useState } from "react";
 
 interface GamehistoryDataType {
   startTime: string;
@@ -16,6 +18,8 @@ interface GamehistoryDataType {
 }
 
 export default function Page() {
+  const [gameCreateOpen, setGameCreateOpen] = useState(false);
+
   const columns: TableProps<GamehistoryDataType>["columns"] = [
     {
       dataIndex: "startTime",
@@ -132,7 +136,7 @@ export default function Page() {
           className={`rounded-xl text ${poppins} text-base w-60 `}
           icon={<Icon icon="material-symbols:add-circle-outline-rounded" />}
           onClick={() => {
-            // setAccountCreateOpen(true);
+            setGameCreateOpen(true);
           }}
         >
           Schedule Game
@@ -279,6 +283,12 @@ export default function Page() {
           />
         </div>
       </div>
+
+      {/* Drawer */}
+      <GameManagementCreateGame
+        open={gameCreateOpen}
+        setOpen={setGameCreateOpen}
+      />
     </div>
   );
 }

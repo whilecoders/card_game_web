@@ -4,15 +4,18 @@ import { Icon } from "@iconify/react";
 import { Dispatch, SetStateAction, useState } from "react";
 import UserManagementEditUsername from "./UserManagementEditUsername";
 import UserManagementManageAccount from "./UserManagementManageAccount";
+import { UserDataType } from "@/app/[locale]/dashboard/user-management/page";
 
 export default function UserManagementAccountDetails({
   open,
   onClose = () => {},
   setOpen,
+  selectedUser,
 }: {
   open: boolean;
   onClose?: () => void;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  selectedUser: UserDataType | undefined;
 }) {
   const [accountEditUsername, setAccountEditUsername] = useState(false);
   const [accountManageUser, setAccountManageUser] = useState(false);
@@ -54,7 +57,7 @@ export default function UserManagementAccountDetails({
           className="rounded-full flex gap-2 items-center w-min text-base"
           icon={<Icon icon="material-symbols:poker-chip-rounded" />}
         >
-          550 Token
+          {selectedUser?.wallet ?? "0"} Token
         </Tag>
         <Tag
           className="rounded-full flex gap-2 items-center w-min text-base"
@@ -79,7 +82,7 @@ export default function UserManagementAccountDetails({
         >
           <div className="flex flex-col">
             <span className="text-xs">Username</span>
-            <span className="text-lg leading-4">Jisan23</span>
+            <span className="text-lg leading-4">{selectedUser?.username}</span>
           </div>
           <Icon icon="mdi:keyboard-arrow-right" fontSize={24} />
         </div>
@@ -113,6 +116,7 @@ export default function UserManagementAccountDetails({
       <UserManagementEditUsername
         open={accountEditUsername}
         setOpen={setAccountEditUsername}
+        userId={Number(selectedUser?.id ?? 0)}
       />
       <UserManagementManageAccount
         open={accountManageUser}

@@ -7,7 +7,7 @@ import { LoginForm, LoginSchema } from "@/schema/login";
 import { poppins } from "@/utils/fonts";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button } from "antd";
-import { setCookie, getCookie, getCookies } from "cookies-next/client";
+import { setCookie, getCookie } from "cookies-next/client";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
