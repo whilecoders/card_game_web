@@ -129,7 +129,7 @@ export default function Page() {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-1 p-6 w-full bg-[#F5F6FA]">
       <div className="text-end">
         <Button
           type="primary"
@@ -144,7 +144,7 @@ export default function Page() {
       </div>
 
       {/* Current Game */}
-      <div className="w-full p-4 rounded-lg border-[.5px] border-[#777B83] flex flex-col gap-4">
+      <div className="w-full p-4 rounded-lg  flex flex-col gap-4">
         <div>
           <h2 className={`${poppins} text-xl font-medium`}>Current Game</h2>
           <p className={`${poppins} text-[#787896] text-sm`}>
@@ -152,7 +152,7 @@ export default function Page() {
           </p>
         </div>
 
-        <div className="lg:flex justify-between grid grid-cols-2 justify-items-start">
+        <div className="lg:flex justify-between bg-white p-2 px-4 rounded-lg shadow-sm grid grid-cols-2 justify-items-start">
           <GameStats
             title="Start Time:"
             data={"9:00 AM"}
@@ -177,30 +177,37 @@ export default function Page() {
           />
         </div>
 
-        <div className="flex gap-4 flex-wrap">
-          <GameStats title="The Most Bid-on Card:" data={"King Of Heart"} />
-          <GameStats title="Bid on This Card:" data={"1,035"} />
-          <GameStats title="Amount of Total Bid:" data={"6,525"} />
+        <div className="flex gap-5">
+          <div className="flex gap-4 flex-wrap bg-white p-2 px-4 rounded-lg shadow-sm ">
+            <GameStats title="The Most Bid-on Card:" data={"King Of Heart"} />
+            <GameStats title="Bid on This Card:" data={"1,035"} />
+          </div>
+          <div className="flex gap-4 flex-wrap bg-white p-2 px-4 rounded-lg shadow-sm ">
+            <GameStats title="Amount of Total Bid:" data={"6,525"} />
+          </div>
         </div>
 
-        <div className="flex">
-          <GameStats title="Selected result card:" data={"Queen Of Spade"} />
-        </div>
 
-        <span className={`${poppins} font-medium text-[#4D4D64]`}>
-          Select a Card To Designate As The Result:
-        </span>
+        <div className="flex bg-white p-2 px-4 w-2/4 py-4 rounded-lg flex-col shadow-sm">
+          <div className="flex mb-5 ">
+            <GameStats title="Selected result card:" data={"Queen Of Spade"} />
+          </div>
 
-        <div className="flex md:gap-20 gap-4 flex-wrap">
-          <Button type="primary" className="w-28">
-            King
-          </Button>
-          <Button type="primary" className="w-28">
-            Queen
-          </Button>
-          <Button type="primary" className="w-28">
-            jack
-          </Button>
+          <span className={`${poppins} mb-3 font-medium text-[#4D4D64]`}>
+            Select a Card To Designate As The Result:
+          </span>
+
+          <div className="flex md:gap-20 flex-wrap">
+            <Button type="primary" className="w-28">
+              King
+            </Button>
+            <Button type="primary" className="w-28">
+              Queen
+            </Button>
+            <Button type="primary" className="w-28">
+              jack
+            </Button>
+          </div>
         </div>
 
         <span className={`${poppins} font-medium text-[#4D4D64] text-wrap`}>
@@ -210,7 +217,7 @@ export default function Page() {
       </div>
 
       {/* Upcoming game */}
-      <div className="w-full p-4 rounded-lg border-[.5px] border-[#777B83] flex flex-col gap-4">
+      <div className="w-full p-4 rounded-lg flex flex-col gap-4">
         <div>
           <h2 className={`${poppins} text-xl font-medium`}>Upcoming Game</h2>
           <p className={`${poppins} text-[#787896] text-sm`}>
@@ -218,7 +225,7 @@ export default function Page() {
           </p>
         </div>
 
-        <div className="flex justify-between flex-wrap gap-4 md:gap-0">
+        <div className="flex justify-between items-center bg-white p-2 px-4 rounded-lg shadow-sm flex-wrap gap-4 md:gap-0">
           <GameStats
             title="Start Time:"
             data={"9:00 AM"}
@@ -244,11 +251,11 @@ export default function Page() {
           <Button type="primary">Reschedule</Button>
         </div>
 
-        <div className="flex gap-4">
+        {/* <div className="flex gap-4">
           <GameStats title="The Most Bid-on Card:" data={"King Of Heart"} />
           <GameStats title="Bid on This Card:" data={"1,035"} />
           <GameStats title="Amount of Total Bid:" data={"6,525"} />
-        </div>
+        </div> */}
 
         <span className={`${poppins} font-medium text-[#4D4D64]`}>
           Guidance: Tap the &apos;Reschedule&apos; button to reschedule the
@@ -257,7 +264,7 @@ export default function Page() {
       </div>
 
       {/* Game History */}
-      <div className="w-full p-4 rounded-lg border-[.5px] border-[#777B83] flex flex-col gap-4">
+      <div className="w-full p-4 rounded-lg  flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <div>
             <h2 className={`${poppins} text-xl font-medium`}>Game History</h2>
@@ -275,7 +282,7 @@ export default function Page() {
           />
         </div>
 
-        <div className="overflow-scroll">
+        <div className="overflow-auto">
           <Table
             rowKey={"gameNo"}
             dataSource={gameHistoryData}

@@ -38,11 +38,11 @@ export default function Layout({
         />
       </div>
 
-      <div className="flex">
+      <div className="flex h-[88vh] ">
         <DashboardDesktopSidebar />
 
         {/* Main Content */}
-        <div className="pt-16 w-full px-12">{children}</div>
+        <div className=" w-full overflow-auto ">{children}</div>
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ export default function DashboardDesktopSidebar() {
   const pahtname = usePathname();
 
   return (
-    <div className="h-full w-[280px] pt-10 hidden xl:block">
+    <div className=" h-full w-[300px] pt-10  hidden xl:block">
       {sidebarItems.map((item) => {
         const isActive = pahtname == item.url;
         return (

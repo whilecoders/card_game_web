@@ -15,12 +15,12 @@ export default function GameStats(props: {
       )}
       <div className="flex flex-col">
         <span
-          className={`text-[#4D4D64] ${poppins} text-xs sm:text-base font-medium`}
+          className={`text-[#4D4D64] ${poppins} text-[40px] sm:text-base font-medium`}
         >
           {props.title}
         </span>
         <span
-          className={`text-[#2E2E3A] ${poppins} text-sm sm:text-lg font-medium`}
+          className={`text-[#2E2E3A] ${poppins} text-xs sm:text-lg font-medium`}
         >
           {props.data}
         </span>

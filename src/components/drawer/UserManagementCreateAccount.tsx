@@ -51,19 +51,23 @@ export default function UserManagementCreateAccount({
         return;
       }
 
+      console.log(city);
+      console.log(phoneNumber);
+      
+
       const response = await ApiCall({
         query: `mutation ($addUserDto: AddUserDto!) {
-  addUser(addUserDto: $addUserDto) {
-    id
-  }
-}`,
+            addUser(addUserDto: $addUserDto) {
+              id
+              }
+            }`,
         veriables: {
           addUserDto: {
             city,
             email,
             password,
-            phone_number: Number(phoneNumber),
             username,
+            phone_number: phoneNumber,
             role: role,
           },
         },
