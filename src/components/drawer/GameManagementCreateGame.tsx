@@ -69,25 +69,33 @@ export default function GameManagementCreateGame({
         return;
       }
 
+      let startTime = new Date(start_time).toLocaleTimeString('en-US', { hour12: false });
+      let endTime = new Date(end_time).toLocaleTimeString('en-US', { hour12: false });
+
+      // console.log(`${startTime.getHours()}:${startTime.getMinutes()}:${startTime.getSeconds()}`);
+      // console.log(startTime);
+      console.log(start_date, end_date);
+      
+      
       const response = await ApiCall({
         query: `mutation ($createGamesDto: CreateGamesDto!) {
-  createGames(createGamesDto: $createGamesDto) {
-    start_time,
-    end_time,
-    game_duration,
-    id
-  }
-}
-`,
+                createGames(createGamesDto: $createGamesDto) {
+                  start_time,
+                  end_time,
+                  game_duration,
+                  id
+                }
+              }
+              `,
         veriables: {
           createGamesDto: {
             admin_id: 1,
-            start_date: "2024-12-05T13:20:06.275Z",
-            end_date: "2024-12-06T13:40:06.275Z",
-            start_time: "13:20:06",
-            end_time: "13:40:06",
-            game_duration: 20,
-            game_in_day: 1,
+            start_date,
+            end_date,
+            start_time: startTime,
+            end_time: endTime,
+            game_duration,
+            game_in_day,
             game_status: "AVAILABLE",
             game_type: "KQJ",
           },

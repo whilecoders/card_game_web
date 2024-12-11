@@ -1,12 +1,16 @@
 "use client";
 
-import { Button, DatePicker, Table, TableProps } from "antd";
-import { Icon } from "@iconify/react";
+import { Badge, Button, DatePicker, Tag} from "antd";
+import { Icon } from "@iconify/react";import { CalendarIcon, Filter } from 'lucide-react'
+
 import { poppins } from "@/utils/fonts";
 import "./style.css";
 import GameStats from "@/components/ui/GameStats";
 import GameManagementCreateGame from "@/components/drawer/GameManagementCreateGame";
 import { useState } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 interface GamehistoryDataType {
   startTime: string;
@@ -15,118 +19,70 @@ interface GamehistoryDataType {
   gameNo: string;
   totalBid: string;
   result: string;
+  status: string
 }
 
 export default function Page() {
   const [gameCreateOpen, setGameCreateOpen] = useState(false);
+  const [gameDate, setGameDate] = useState<Date>(new Date())
+  const [filters, setFilters] = useState({
+    status: "all",
+    result: "all",
+    gameId: "",
+  })
 
-  const columns: TableProps<GamehistoryDataType>["columns"] = [
-    {
-      dataIndex: "startTime",
-      render: (data) => (
-        <GameStats
-          title="Start Time"
-          data={data}
-          icon={<Icon icon="mdi-light:clock" />}
-        />
-      ),
-    },
-    {
-      dataIndex: "endTime",
-      render: (data) => (
-        <GameStats
-          title="End Time"
-          data={data}
-          icon={
-            <Icon icon="material-symbols-light:calendar-today-outline-rounded" />
-          }
-        />
-      ),
-    },
-    {
-      dataIndex: "gameDuration",
-      render: (data) => (
-        <GameStats
-          title="Game Duration"
-          data={data}
-          icon={<Icon icon="solar:stopwatch-broken" />}
-        />
-      ),
-    },
-    {
-      dataIndex: "gameNo",
-      render: (data) => (
-        <GameStats
-          title="Game No."
-          data={data}
-          icon={<Icon icon="tabler:hash" />}
-        />
-      ),
-    },
-    {
-      dataIndex: "totalBid",
-      render: (data) => (
-        <GameStats
-          title="Total Bid"
-          data={data}
-          icon={<Icon icon="material-symbols:bid-landscape-outline-rounded" />}
-        />
-      ),
-    },
-    {
-      dataIndex: "result",
-      render: (data) => (
-        <GameStats
-          title="Result"
-          data={data}
-          icon={<Icon icon="fluent:poll-horizontal-20-regular" />}
-        />
-      ),
-    },
-  ];
+const gameHistoryData: GamehistoryDataType[] = [
+  {
+    startTime: "8:45 AM",
+    endTime: "9:00 AM",
+    gameDuration: "15 Minutes",
+    gameNo: "1",
+    totalBid: "25,665",
+    result: "King of Club",
+    status: "WIN"
+  },
+  {
+    startTime: "8:45 AM",
+    endTime: "9:00 AM",
+    gameDuration: "15 Minutes",
+    gameNo: "2",
+    totalBid: "25,665",
+    result: "King of Club",
+    status: "WIN"
+  },
+  {
+    startTime: "8:45 AM",
+    endTime: "9:00 AM",
+    gameDuration: "15 Minutes",
+    gameNo: "3",
+    totalBid: "25,665",
+    result: "King of Club",
+    status: "WIN"
+  },
+  {
+    startTime: "8:45 AM",
+    endTime: "9:00 AM",
+    gameDuration: "15 Minutes",
+    gameNo: "4",
+    totalBid: "25,665",
+    result: "King of Club",
+    status: "WIN"
+  },
+  {
+    startTime: "8:45 AM",
+    endTime: "9:00 AM",
+    gameDuration: "15 Minutes",
+    gameNo: "5",
+    totalBid: "25,665",
+    result: "King of Club",
+    status: "WIN"
+  },
+];
 
-  const gameHistoryData: GamehistoryDataType[] = [
-    {
-      startTime: "8:45 AM",
-      endTime: "9:00 AM",
-      gameDuration: "15 Minutes",
-      gameNo: "1",
-      totalBid: "25,665",
-      result: "King of Club",
-    },
-    {
-      startTime: "8:45 AM",
-      endTime: "9:00 AM",
-      gameDuration: "15 Minutes",
-      gameNo: "2",
-      totalBid: "25,665",
-      result: "King of Club",
-    },
-    {
-      startTime: "8:45 AM",
-      endTime: "9:00 AM",
-      gameDuration: "15 Minutes",
-      gameNo: "3",
-      totalBid: "25,665",
-      result: "King of Club",
-    },
-    {
-      startTime: "8:45 AM",
-      endTime: "9:00 AM",
-      gameDuration: "15 Minutes",
-      gameNo: "4",
-      totalBid: "25,665",
-      result: "King of Club",
-    },
-    {
-      startTime: "8:45 AM",
-      endTime: "9:00 AM",
-      gameDuration: "15 Minutes",
-      gameNo: "5",
-      totalBid: "25,665",
-      result: "King of Club",
-    },
-  ];
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }))
+  }
 
   return (
     <div className="flex flex-col gap-1 p-6 w-full bg-[#F5F6FA]">
@@ -216,78 +172,94 @@ export default function Page() {
         </span>
       </div>
 
-      {/* Upcoming game */}
-      <div className="w-full p-4 rounded-lg flex flex-col gap-4">
-        <div>
-          <h2 className={`${poppins} text-xl font-medium`}>Upcoming Game</h2>
-          <p className={`${poppins} text-[#787896] text-sm`}>
-            The following are the states of the upcoming game.
-          </p>
-        </div>
-
-        <div className="flex justify-between items-center bg-white p-2 px-4 rounded-lg shadow-sm flex-wrap gap-4 md:gap-0">
-          <GameStats
-            title="Start Time:"
-            data={"9:00 AM"}
-            icon={<Icon icon="mdi-light:clock" />}
-          />
-          <GameStats
-            title="End Time:"
-            data={"9:15 AM"}
-            icon={
-              <Icon icon="material-symbols-light:calendar-today-outline-rounded" />
-            }
-          />
-          <GameStats
-            title="Game Duration"
-            data={"15 Minutes"}
-            icon={<Icon icon="solar:stopwatch-broken" />}
-          />
-          <GameStats
-            title="Game No."
-            data={"2"}
-            icon={<Icon icon="tabler:hash" />}
-          />
-          <Button type="primary">Reschedule</Button>
-        </div>
-
-        {/* <div className="flex gap-4">
-          <GameStats title="The Most Bid-on Card:" data={"King Of Heart"} />
-          <GameStats title="Bid on This Card:" data={"1,035"} />
-          <GameStats title="Amount of Total Bid:" data={"6,525"} />
-        </div> */}
-
-        <span className={`${poppins} font-medium text-[#4D4D64]`}>
-          Guidance: Tap the &apos;Reschedule&apos; button to reschedule the
-          game.
-        </span>
-      </div>
-
-      {/* Game History */}
-      <div className="w-full p-4 rounded-lg  flex flex-col gap-4">
-        <div className="flex justify-between items-center">
+      <div className="w-full p-6 space-y-4 bg-gray-50 rounded-lg shadow-lg">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className={`${poppins} text-xl font-medium`}>Game History</h2>
-            <p className={`${poppins} text-[#787896] text-sm`}>
-              The details below pertain only to today&apos;s games. Use the
-              &apos;Date&apos; button to view details of games from other days.
+            <h2 className="text-2xl font-semibold text-gray-800">Today's Games</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              The details below pertain only to today's games. Use the 'Date' button to view details of games from other days.
             </p>
           </div>
-
           <DatePicker
             style={{ width: 240 }}
-            // onChange={onChange} TODO: what to do on change
+            onChange={(selectDate) => setGameDate(selectDate)}
+            value={gameDate}
             needConfirm={true}
             placeholder="Date"
           />
         </div>
 
-        <div className="overflow-auto">
-          <Table
-            rowKey={"gameNo"}
-            dataSource={gameHistoryData}
-            columns={columns}
-          />
+        <div className="flex  gap-4 items-center justify-start bg-white p-4 rounded-md shadow">
+            <Filter className="text-gray-400" />
+            <Select onValueChange={(value) => handleFilterChange("status", value)}>
+            <SelectTrigger className="w-40">
+              <SelectValue className="w-[90px]" placeholder="Filter by Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="Done">Done</SelectItem>
+              <SelectItem value="In Progress">In Progress</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select onValueChange={(value) => handleFilterChange("result", value)}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Filter by Result" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Results</SelectItem>
+              <SelectItem value="Win">Win</SelectItem>
+              <SelectItem value="Loss">Loss</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="grow"></div>
+
+          <div className="flex items-center space-x-2">
+            <Filter className="text-gray-400" />
+            <Input
+              placeholder="Filter by Game ID"
+              className="w-[300px]" 
+              value={filters.gameId}
+              onChange={(e) => handleFilterChange("gameId", e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">Start Time</TableHead>
+                <TableHead className="text-center">End Time</TableHead>
+                <TableHead className="text-center">Game Duration</TableHead>
+                <TableHead className="text-center">Game Id</TableHead>
+                <TableHead className="text-center">Total Bid</TableHead>
+                <TableHead className="text-center">Result</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {gameHistoryData.map((game, index) => (
+                <TableRow key={index}>
+                  <TableCell className="text-center">{game.startTime}</TableCell>
+                  <TableCell className="text-center">{game.endTime}</TableCell>
+                  <TableCell className="text-center">{game.gameDuration}</TableCell>
+                  <TableCell className="text-center">{game.gameNo}</TableCell>
+                  <TableCell className="text-center">{game.totalBid}</TableCell>
+                  <TableCell className="text-center">
+                    <Badge>
+                      {game.result}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Tag  color="green">
+                      {game.status}
+                    </Tag>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
 

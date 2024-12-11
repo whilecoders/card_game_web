@@ -22,12 +22,14 @@ export default async function RootLayout({
   params: { locale: string };
 }>) {
   // Ensure that the incoming `locale` is valid
+  // await children
+  
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
   // Enable static rendering
-  setRequestLocale(locale);
+  setRequestLocale(locale ?? "");
 
   // Providing all messages to the client
   // side is the easiest way to get started
