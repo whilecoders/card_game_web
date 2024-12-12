@@ -18,7 +18,7 @@ import {
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { ApiCall } from "@/lib/api";
+import { ApiCall, ApiRespose } from "@/lib/api";
 import { toast } from "react-toastify";
 import { formateDate } from "@/lib/methods";
 
@@ -47,22 +47,22 @@ export default function Page() {
   const userQuery = useQuery({
     queryKey: ["GetAllUser", page],
     queryFn: async () => {
-      const response = await ApiCall({
+      const response: ApiRespose = await ApiCall({
         query: `query ($skip: Int!, $take: Int!) {
-    getAllUsers(skip: $skip, take: $take) {
-      count,
-      skip,
-      take,
-      data {
-        id,
-        username,
-        role,
-        wallet,
-        createdAt,
-        phone_number
-      }
-    }
-  }`,
+            getAllUsers(skip: $skip, take: $take) {
+              count,
+              skip,
+              take,
+              data {
+                id,
+                username,
+                role,
+                wallet,
+                createdAt,
+                phone_number
+              }
+            }
+          }`,
         veriables: {
           skip: (page - 1) * perPageData,
           take: perPageData,

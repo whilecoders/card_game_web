@@ -16,6 +16,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { ApiCall } from "@/lib/api";
 import { setCookie, getCookie } from "cookies-next/client";
 import { toast } from "react-toastify";
+import { formatDateTime, formateDate } from "@/lib/methods";
 
 dayjs.extend(customParseFormat);
 
@@ -72,11 +73,6 @@ export default function GameManagementCreateGame({
       let startTime = new Date(start_time).toLocaleTimeString('en-US', { hour12: false });
       let endTime = new Date(end_time).toLocaleTimeString('en-US', { hour12: false });
 
-      // console.log(`${startTime.getHours()}:${startTime.getMinutes()}:${startTime.getSeconds()}`);
-      // console.log(startTime);
-      console.log(start_date, end_date);
-      
-      
       const response = await ApiCall({
         query: `mutation ($createGamesDto: CreateGamesDto!) {
                 createGames(createGamesDto: $createGamesDto) {
@@ -90,8 +86,8 @@ export default function GameManagementCreateGame({
         veriables: {
           createGamesDto: {
             admin_id: 1,
-            start_date,
-            end_date,
+            start_date: formatDateTime(start_date),
+            end_date: formatDateTime(end_date),
             start_time: startTime,
             end_time: endTime,
             game_duration,

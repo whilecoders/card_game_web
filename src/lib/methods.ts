@@ -103,35 +103,40 @@ const longtext = (text: string, long: number): string => {
 };
 export { longtext };
 
-const formatDateTime = (date: Date): string => {
+const formatDateTime = (inputDate: string | Date): string => {
+    const date = new Date(inputDate);
+
+    // Validate the date
+    if (isNaN(date.getTime())) {
+        throw new Error("Invalid Date provided");
+    }
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    const seconds = date.getSeconds();
+    const seconds = date.getSeconds() ;
     const meridiem = date.getHours() < 12 ? "AM" : "PM";
 
     const formattedTime =
-        (hours % 12 || 12) +
+        (hours < 10 ? "0" : "") +
+        hours +
         ":" +
         (minutes < 10 ? "0" : "") +
         minutes +
         ":" +
         (seconds < 10 ? "0" : "") +
-        seconds +
-        " " +
-        meridiem;
+        seconds 
 
     //  if month and day is less than 10, add 0 before month
     if (month < 10 && day < 10) {
-        return `0${day}-0${month}-${year} ${formattedTime}`;
+        return `${year}-0${month}-0${day}T${formattedTime}.275Z`;
     } else if (month < 10) {
-        return `${day}-0${month}-${year} ${formattedTime}`;
+        return `${year}-0${month}-${day}T${formattedTime}.275Z`;
     } else if (day < 10) {
-        return `0${day}-${month}-${year} ${formattedTime}`;
+        return `${year}-${month}-0${day}T${formattedTime}.275Z`;
     } else {
-        return `${day}-${month}-${year} ${formattedTime}`;
+        return `${year}-${month}-${day}T${formattedTime}.275Z`;
     }
 };
 
@@ -383,4 +388,16 @@ export const decryptURLData = (
         router.back();
         return "";
     }
+};
+
+
+const formatDate = (date: Date): string => {
+    const yy = date.getFullYear().toString().slice(-2); // Get last 2 digits of the year
+    const mm = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const dd = String(date.getDate()).padStart(2, "0");
+    const HH = String(date.getHours()).padStart(2, "0");
+    const MM = String(date.getMinutes()).padStart(2, "0");
+    const SS = String(date.getSeconds()).padStart(2, "0");
+
+    return `${yy}-${mm}-${dd}T${HH}:${MM}:${SS}`;
 };

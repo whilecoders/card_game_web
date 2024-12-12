@@ -1,7 +1,7 @@
 import axios from "axios";
 import { API_BASE_URL } from "./const";
 
-type ApiRespose = {
+ export type ApiRespose = {
   status: boolean;
   data: any;
   message: string;

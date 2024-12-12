@@ -2,15 +2,20 @@
 
 import { Badge, Button, DatePicker, Tag} from "antd";
 import { Icon } from "@iconify/react";import { CalendarIcon, Filter } from 'lucide-react'
-
+import { CiSearch } from "react-icons/ci";
 import { poppins } from "@/utils/fonts";
 import "./style.css";
 import GameStats from "@/components/ui/GameStats";
 import GameManagementCreateGame from "@/components/drawer/GameManagementCreateGame";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { useQuery } from "@tanstack/react-query";
+import { ApiCall, ApiRespose } from "@/lib/api";
+import { GameKqjCards, GameSessionKqj } from "@/models/Game/gameSession";
+import dayjs from "dayjs";
+import { formatDateTime } from "@/lib/methods";
 
 interface GamehistoryDataType {
   startTime: string;
@@ -24,65 +29,92 @@ interface GamehistoryDataType {
 
 export default function Page() {
   const [gameCreateOpen, setGameCreateOpen] = useState(false);
-  const [gameDate, setGameDate] = useState<Date>(new Date())
-  const [filters, setFilters] = useState({
-    status: "all",
-    result: "all",
-    gameId: "",
-  })
-
-const gameHistoryData: GamehistoryDataType[] = [
-  {
-    startTime: "8:45 AM",
-    endTime: "9:00 AM",
-    gameDuration: "15 Minutes",
-    gameNo: "1",
-    totalBid: "25,665",
-    result: "King of Club",
-    status: "WIN"
-  },
-  {
-    startTime: "8:45 AM",
-    endTime: "9:00 AM",
-    gameDuration: "15 Minutes",
-    gameNo: "2",
-    totalBid: "25,665",
-    result: "King of Club",
-    status: "WIN"
-  },
-  {
-    startTime: "8:45 AM",
-    endTime: "9:00 AM",
-    gameDuration: "15 Minutes",
-    gameNo: "3",
-    totalBid: "25,665",
-    result: "King of Club",
-    status: "WIN"
-  },
-  {
-    startTime: "8:45 AM",
-    endTime: "9:00 AM",
-    gameDuration: "15 Minutes",
-    gameNo: "4",
-    totalBid: "25,665",
-    result: "King of Club",
-    status: "WIN"
-  },
-  {
-    startTime: "8:45 AM",
-    endTime: "9:00 AM",
-    gameDuration: "15 Minutes",
-    gameNo: "5",
-    totalBid: "25,665",
-    result: "King of Club",
-    status: "WIN"
-  },
-];
-
-
+  const [gameDate, setGameDate] = useState(dayjs())
+  const [filtersResult, setFiltersResult] = useState<string>()
+  const [filterStatus, setFilterStatus] = useState<string>()
+  const [filterMode, setFilterMode] = useState(false)
+  const [gameSessions, setGameSessions] = useState<GameSessionKqj[]>([])
+  const [gameId, setGameId] = useState<string>('')
+  const [searchedGameSession, setSearchedGameSessions] = useState<GameSessionKqj[]>([])
   const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
+    // setFilters((prev) => ({ ...prev, [key]: value }))
   }
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["getTodaySession"],
+    queryFn: async () => {
+      const response: ApiRespose = await ApiCall({
+        query: `       
+        query getGameSessionsByDateOrToday {
+          getGameSessionsByDateOrToday {
+            id,
+            session_start_time,
+            session_end_time,
+            game_result_card,
+            session_status,
+            game {
+              game_duration
+            }
+          }
+        }`,
+        veriables: {},
+      });
+      console.log(response);
+      setGameSessions(response.data?.getGameSessionsByDateOrToday as GameSessionKqj[]);
+      return response.data?.getGameSessionsByDateOrToday || [];
+    },
+  });
+
+
+  async function handleGameFilterByDate(date: dayjs.Dayjs)  {
+    const asDate = new Date(date.subtract(5, "hours").subtract(30, "minutes").toString())
+    const fromDate = new Date(asDate.setHours(0,0,0,0));
+    const toDate = new Date(asDate.setHours(23, 59, 59, 999));
+    
+    const response: ApiRespose = await ApiCall({
+      query: `       
+      query getGameSessionsByDateOrToday($startDate: DateTime!, $endDate: DateTime!) {
+        getGameSessionsByDateOrToday(startDate: $startDate, endDate: $endDate) {
+          id,
+          session_start_time,
+          session_end_time,
+          game_result_card,
+          session_status,
+          game {
+            game_duration
+          }
+        }
+      }`,
+      veriables: {
+        "startDate": formatDateTime(fromDate.toString()),
+        "endDate": formatDateTime(toDate.toString()),
+      },
+    });
+    if (response.status) {
+      // gameSessions = [];
+      setGameSessions(response.data.getGameSessionsByDateOrToday as GameSessionKqj[]);
+      console.log(response);
+      
+      // setGameDate(date)
+    }
+  }
+  
+  async function handleFilter(filterName: string, value: string) {
+    const existedSession = gameSessions;
+    if (existedSession.length === 0) return;
+    if (!filterMode) setFilterMode(true)
+    let searchedSeession: GameSessionKqj[] = []
+    if (filterName === "STATUS") {
+      searchedSeession = existedSession.filter((session) => session.session_status?.toString() === value)
+      setFilterStatus(value)
+    }  else if (filterName === "RESULT") {
+      searchedSeession = existedSession.filter((session) => session.game_result_card?.toString() === value)
+      setFiltersResult(value)
+    } else {
+      searchedSeession = existedSession.filter((session) => session.id?.toString() === value)
+    }
+    setSearchedGameSessions(searchedSeession)
+  }
+  
 
   return (
     <div className="flex flex-col gap-1 p-6 w-full bg-[#F5F6FA]">
@@ -182,18 +214,17 @@ const gameHistoryData: GamehistoryDataType[] = [
           </div>
           <DatePicker
             style={{ width: 240 }}
-            onChange={(selectDate) => setGameDate(selectDate)}
-            value={gameDate}
+            onChange={e=>handleGameFilterByDate(e)}
+            // value={gameDate}
             needConfirm={true}
             placeholder="Date"
           />
         </div>
-
         <div className="flex  gap-4 items-center justify-start bg-white p-4 rounded-md shadow">
             <Filter className="text-gray-400" />
-            <Select onValueChange={(value) => handleFilterChange("status", value)}>
-            <SelectTrigger className="w-40">
-              <SelectValue className="w-[90px]" placeholder="Filter by Status" />
+            <Select onValueChange={value=>handleFilter("STATUS", value)} value={filterStatus}>
+            <SelectTrigger className="w-[14%]">
+              <SelectValue placeholder="Filter by Status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
@@ -201,65 +232,113 @@ const gameHistoryData: GamehistoryDataType[] = [
               <SelectItem value="In Progress">In Progress</SelectItem>
             </SelectContent>
           </Select>
-
-          <Select onValueChange={(value) => handleFilterChange("result", value)}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Filter by Result" />
+          <Select onValueChange={value=>handleFilter("RESULT", value)} value={filtersResult}>
+            <SelectTrigger className="w-[14%]">
+              <SelectValue  placeholder="Filter by Result" className=" placeholder:bg-zinc-100"/>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Results</SelectItem>
-              <SelectItem value="Win">Win</SelectItem>
-              <SelectItem value="Loss">Loss</SelectItem>
+              {
+                Object.values(GameKqjCards)        
+                .filter((key) => isNaN(Number(key))) 
+                .map((card, index) => {
+                  return <>
+                    <SelectItem key={index} value={card.toString()}>{card.toString()}</SelectItem>
+                  </>
+                })
+              }
             </SelectContent>
           </Select>
+          {
+            filterMode && <Button onClick={e=>{
+              setFilterMode(false); 
+              setFiltersResult("");
+              setFilterStatus("");
+            }}>Clear filter</Button>
+          }
           <div className="grow"></div>
-
-          <div className="flex items-center space-x-2">
-            <Filter className="text-gray-400" />
-            <Input
-              placeholder="Filter by Game ID"
-              className="w-[300px]" 
-              value={filters.gameId}
-              onChange={(e) => handleFilterChange("gameId", e.target.value)}
-            />
+          <div className="flex items-center w-[20%] space-x-2">
+            <Filter className="text-gray-400 " />
+            <div className="flex items-center h-9">
+              <Input
+                placeholder="Filter by Game ID"
+                value={gameId}
+                className="w-[300px] rounded-r-none" 
+                onChange={(e) => setGameId(e.target.value)}
+              />
+              <Button 
+                onClick={e => handleFilter("GAME_ID", gameId)} 
+                className="rounded-l-none h-full p-2" color="primary">
+                  <CiSearch className="text-lg"/>
+              </Button>
+            </div> 
           </div>
         </div>
 
         <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-          <Table>
-            <TableHeader>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-center">Start Time</TableHead>
+              <TableHead className="text-center">End Time</TableHead>
+              <TableHead className="text-center">Game Duration</TableHead>
+              <TableHead className="text-center">Game Id</TableHead>
+              <TableHead className="text-center">Total Bid</TableHead>
+              <TableHead className="text-center">Result</TableHead>
+              <TableHead className="text-center">Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
               <TableRow>
-                <TableHead className="text-center">Start Time</TableHead>
-                <TableHead className="text-center">End Time</TableHead>
-                <TableHead className="text-center">Game Duration</TableHead>
-                <TableHead className="text-center">Game Id</TableHead>
-                <TableHead className="text-center">Total Bid</TableHead>
-                <TableHead className="text-center">Result</TableHead>
-                <TableHead className="text-center">Status</TableHead>
+                <TableCell colSpan={7} className="text-center">
+                  Loading...
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {gameHistoryData.map((game, index) => (
-                <TableRow key={index}>
-                  <TableCell className="text-center">{game.startTime}</TableCell>
-                  <TableCell className="text-center">{game.endTime}</TableCell>
-                  <TableCell className="text-center">{game.gameDuration}</TableCell>
-                  <TableCell className="text-center">{game.gameNo}</TableCell>
-                  <TableCell className="text-center">{game.totalBid}</TableCell>
-                  <TableCell className="text-center">
-                    <Badge>
-                      {game.result}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Tag  color="green">
-                      {game.status}
-                    </Tag>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+            ) : filterMode
+              ? (
+                searchedGameSession.map((session: GameSessionKqj, index: number) => (
+                  <TableRow key={index}>
+                    <TableCell className="text-center">
+                      {new Date(session.session_start_time ?? "--").toLocaleString() || "--"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {new Date(session.session_end_time ?? "--").toLocaleString() || "--"}
+                    </TableCell>
+                    <TableCell className="text-center">{session.game?.game_duration || "N/A"}</TableCell>
+                    <TableCell className="text-center">{session.id}</TableCell>
+                    <TableCell className="text-center">{"342"}</TableCell>
+                    <TableCell className="text-center">
+                      <Badge>{session.game_result_card ?? "--"}</Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Tag color="green">{session.session_status}</Tag>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )
+              : (
+                gameSessions.map((session: GameSessionKqj, index: number) => (
+                  <TableRow key={index}>
+                    <TableCell className="text-center">
+                      {new Date(session.session_start_time ?? "--").toLocaleString() || "--"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {new Date(session.session_end_time ?? "--").toLocaleString() || "--"}
+                    </TableCell>
+                    <TableCell className="text-center">{session.game?.game_duration || "N/A"}</TableCell>
+                    <TableCell className="text-center">{session.id}</TableCell>
+                    <TableCell className="text-center">{"342"}</TableCell>
+                    <TableCell className="text-center">
+                      <Badge>{session.game_result_card ?? "--"}</Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Tag color="green">{session.session_status}</Tag>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+          </TableBody>
+        </Table>
         </div>
       </div>
 
