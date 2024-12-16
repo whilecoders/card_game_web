@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./styles.css";
 import "react-toastify/dist/ReactToastify.css";
 import AppProvider from "@/components/AppProvider";
+import { Toaster } from "@/components/ui/toaster"
 
 type Props = {
   children: ReactNode;
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: Props) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AppProvider>{children}</AppProvider>
+        <Toaster/>
       </body>
     </html>
   );

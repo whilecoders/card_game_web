@@ -63,7 +63,7 @@ export default function Page() {
               }
             }
           }`,
-        veriables: {
+        variables: {
           skip: (page - 1) * perPageData,
           take: perPageData,
         },

@@ -35,7 +35,7 @@ export default function UserManagementEditUsername({
     username
   }
 }`,
-        veriables: {
+        variables: {
           updateUserDto: {
             username,
           },

@@ -8,7 +8,7 @@ const fetchData = async (queryKey: string) => {
   return await ApiCall({
     query: `query ${queryKey} {
   ${queryKey}
-}`, veriables: {}
+}`, variables: {}
   })
 }
 

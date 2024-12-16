@@ -9,7 +9,7 @@ import { API_BASE_URL } from "./const";
 
 export const ApiCall = async (args: {
   query: string;
-  veriables: {
+  variables: {
     [key: string]: unknown;
   };
   headers?: {
@@ -21,7 +21,7 @@ export const ApiCall = async (args: {
       API_BASE_URL,
       {
         query: args.query,
-        variables: args.veriables,
+        variables: args.variables,
       },
       { headers: args.headers }
     );

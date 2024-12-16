@@ -1,21 +1,24 @@
 "use client";
 
-import { Badge, Button, DatePicker, Tag} from "antd";
+import { Badge, Button, DatePicker, Modal, Tag} from "antd";
 import { Icon } from "@iconify/react";import { CalendarIcon, Filter } from 'lucide-react'
 import { CiSearch } from "react-icons/ci";
 import { poppins } from "@/utils/fonts";
 import "./style.css";
 import GameStats from "@/components/ui/GameStats";
 import GameManagementCreateGame from "@/components/drawer/GameManagementCreateGame";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { ApiCall, ApiRespose } from "@/lib/api";
-import { GameKqjCards, GameSessionKqj } from "@/models/Game/gameSession";
+import { GameKqjCards, GameSessionKqj, GameSessionStatus } from "@/models/Game/gameSession";
 import dayjs from "dayjs";
 import { formatDateTime } from "@/lib/methods";
+import { toast } from "react-toastify";
+import { GameControlDialog } from "@/components/dialog/game-control-dialog";
+
 
 interface GamehistoryDataType {
   startTime: string;
@@ -30,40 +33,69 @@ interface GamehistoryDataType {
 export default function Page() {
   const [gameCreateOpen, setGameCreateOpen] = useState(false);
   const [gameDate, setGameDate] = useState(dayjs())
+  const [currentLiveSession, setCurrentLiveSession] = useState<GameSessionKqj>()
   const [filtersResult, setFiltersResult] = useState<string>()
   const [filterStatus, setFilterStatus] = useState<string>()
   const [filterMode, setFilterMode] = useState(false)
   const [gameSessions, setGameSessions] = useState<GameSessionKqj[]>([])
+  const [isModalOpen, setModalOpen] = useState(false);
   const [gameId, setGameId] = useState<string>('')
   const [searchedGameSession, setSearchedGameSessions] = useState<GameSessionKqj[]>([])
-  const handleFilterChange = (key: string, value: string) => {
-    // setFilters((prev) => ({ ...prev, [key]: value }))
-  }
+  const [selectedGame, setSelectedGame] = useState<GameSessionKqj | null>(null)
+  
   const { data, error, isLoading } = useQuery({
     queryKey: ["getTodaySession"],
-    queryFn: async () => {
-      const response: ApiRespose = await ApiCall({
-        query: `       
-        query getGameSessionsByDateOrToday {
-          getGameSessionsByDateOrToday {
-            id,
-            session_start_time,
-            session_end_time,
-            game_result_card,
-            session_status,
-            game {
-              game_duration
+    queryFn: async () =>  {
+      let  response: ApiRespose | undefined= undefined;
+      try {
+         response = await ApiCall({
+          query: `       
+          query getGameSessionsByDateOrToday {
+            getGameSessionsByDateOrToday {
+              id,
+              session_start_time,
+              session_end_time,
+              game_result_card,
+              session_status,
+              game {
+                game_duration
+              }
             }
-          }
-        }`,
-        veriables: {},
-      });
-      console.log(response);
-      setGameSessions(response.data?.getGameSessionsByDateOrToday as GameSessionKqj[]);
-      return response.data?.getGameSessionsByDateOrToday || [];
+          }`,
+          variables: {},
+        });
+        //  const liveSessionResponse: ApiRespose = await ApiCall({
+        //   query: `       
+        //   query getLiveGameSessions {
+        //     getLiveGameSessions {
+        //       id,
+        //       session_start_time,
+        //       session_end_time,
+        //       game_result_card,
+        //       session_status,
+        //       game {
+        //         game_duration
+        //       }
+        //     }
+        //   }`,
+        //   veriables: {},
+        // });
+        // console.log(response);
+        if (!response.status) {
+          toast.error(response.message);
+          return;
+        }
+        const liveSession: GameSessionKqj | undefined =  (response.data?.getGameSessionsByDateOrToday as GameSessionKqj[])
+          .find((session) => session.session_status.toString() === "LIVE")
+        setCurrentLiveSession(liveSession)
+        setGameSessions(response.data?.getGameSessionsByDateOrToday as GameSessionKqj[]);
+        return response.data?.getGameSessionsByDateOrToday || [];
+      } catch {
+        toast.error(response?.message ?? "");
+        return;
+      }
     },
   });
-
 
   async function handleGameFilterByDate(date: dayjs.Dayjs)  {
     const asDate = new Date(date.subtract(5, "hours").subtract(30, "minutes").toString())
@@ -72,29 +104,30 @@ export default function Page() {
     
     const response: ApiRespose = await ApiCall({
       query: `       
-      query getGameSessionsByDateOrToday($startDate: DateTime!, $endDate: DateTime!) {
-        getGameSessionsByDateOrToday(startDate: $startDate, endDate: $endDate) {
-          id,
-          session_start_time,
-          session_end_time,
-          game_result_card,
-          session_status,
+      query getGameSessionsByDateOrToday($filter: DateFilterDto!) {
+        getGameSessionsByDateOrToday(filter: $filter) {
+          id
+          session_start_time
+          session_end_time
+          game_result_card
+          session_status
           game {
             game_duration
           }
         }
       }`,
-      veriables: {
-        "startDate": formatDateTime(fromDate.toString()),
-        "endDate": formatDateTime(toDate.toString()),
+      variables: {
+        filter: {
+          "startDate": formatDateTime(fromDate.toString()),
+          "endDate": formatDateTime(toDate.toString()),
+        }
       },
     });
+    console.log(formatDateTime(fromDate.toString()), formatDateTime(toDate.toString()));
+    console.log(response);
     if (response.status) {
-      // gameSessions = [];
       setGameSessions(response.data.getGameSessionsByDateOrToday as GameSessionKqj[]);
       console.log(response);
-      
-      // setGameDate(date)
     }
   }
   
@@ -115,9 +148,10 @@ export default function Page() {
     setSearchedGameSessions(searchedSeession)
   }
   
+  
 
   return (
-    <div className="flex flex-col gap-1 p-6 w-full bg-[#F5F6FA]">
+    <div className="flex flex-col gap-1 p-6 w-full  bg-[#F5F6FA]">
       <div className="text-end">
         <Button
           type="primary"
@@ -132,77 +166,94 @@ export default function Page() {
       </div>
 
       {/* Current Game */}
-      <div className="w-full p-4 rounded-lg  flex flex-col gap-4">
-        <div>
-          <h2 className={`${poppins} text-xl font-medium`}>Current Game</h2>
-          <p className={`${poppins} text-[#787896] text-sm`}>
-            The following are the current states of the game in progress.
-          </p>
-        </div>
-
-        <div className="lg:flex justify-between bg-white p-2 px-4 rounded-lg shadow-sm grid grid-cols-2 justify-items-start">
-          <GameStats
-            title="Start Time:"
-            data={"9:00 AM"}
-            icon={<Icon icon="mdi-light:clock" />}
-          />
-          <GameStats
-            title="End Time:"
-            data={"9:15 AM"}
-            icon={
-              <Icon icon="material-symbols-light:calendar-today-outline-rounded" />
-            }
-          />
-          <GameStats
-            title="Game Duration"
-            data={"15 Minutes"}
-            icon={<Icon icon="solar:stopwatch-broken" />}
-          />
-          <GameStats
-            title="Game No."
-            data={"2"}
-            icon={<Icon icon="tabler:hash" />}
-          />
-        </div>
-
-        <div className="flex gap-5">
-          <div className="flex gap-4 flex-wrap bg-white p-2 px-4 rounded-lg shadow-sm ">
-            <GameStats title="The Most Bid-on Card:" data={"King Of Heart"} />
-            <GameStats title="Bid on This Card:" data={"1,035"} />
-          </div>
-          <div className="flex gap-4 flex-wrap bg-white p-2 px-4 rounded-lg shadow-sm ">
-            <GameStats title="Amount of Total Bid:" data={"6,525"} />
-          </div>
-        </div>
-
-
-        <div className="flex bg-white p-2 px-4 w-2/4 py-4 rounded-lg flex-col shadow-sm">
-          <div className="flex mb-5 ">
-            <GameStats title="Selected result card:" data={"Queen Of Spade"} />
+      {  (isLoading) ? <> Loading... </> : currentLiveSession &&
+        <div className="w-full p-4 rounded-lg  flex flex-col gap-4">
+          <div>
+            <h2 className={`${poppins} text-xl font-medium`}>Current Game</h2>
+            <p className={`${poppins} text-[#787896] text-sm`}>
+              The following are the current states of the game in progress.
+            </p>
           </div>
 
-          <span className={`${poppins} mb-3 font-medium text-[#4D4D64]`}>
-            Select a Card To Designate As The Result:
+          <div className="lg:flex justify-between bg-white p-2 px-4 rounded-lg shadow-sm grid grid-cols-2 justify-items-start">
+            <GameStats
+              title="Start Time:"
+              data={currentLiveSession?.session_start_time 
+                ? dayjs(currentLiveSession.session_start_time).format('DD/MM/YYYY HH:mm') 
+                : ""}
+            />
+            <GameStats
+              title="End Time:"
+              data={currentLiveSession?.session_end_time 
+                ? dayjs(currentLiveSession.session_end_time).format('DD/MM/YYYY HH:mm') 
+                : ""}
+            />
+            <GameStats
+              title="Game Duration"
+              data={currentLiveSession?.game.game_duration?.toString() ?? ""}
+              icon={<Icon icon="solar:stopwatch-broken" />}
+            />
+            <GameStats
+              title="Game Id."
+              data={currentLiveSession?.id?.toString() ?? ""}
+              icon={<Icon icon="tabler:hash" />}
+            />
+          </div>
+          {/* 
+          <div className="flex gap-5">
+            <div className="flex gap-4 flex-wrap bg-white p-2 px-4 rounded-lg shadow-sm ">
+              <GameStats title="The Most Bid-on Card:" data={"King Of Heart"} />
+              <GameStats title="Bid on This Card:" data={"1,035"} />
+            </div>
+            <div className="flex gap-4 flex-wrap bg-white p-2 px-4 rounded-lg shadow-sm ">
+              <GameStats title="Amount of Total Bid:" data={"6,525"} />
+            </div>
+          </div> */}
+
+          {/* open result for current game */}
+          <div className="flex bg-white p-2 px-4 w-2/4 py-4 rounded-lg flex-col shadow-sm">
+            <div className="flex mb-5 ">
+              <GameStats title="Selected result card:" data={"Queen Of Spade"} />
+            </div>
+
+            <span className={`${poppins} mb-3 font-medium text-[#4D4D64]`}>
+              Select a Card To Designate As The Result:
+            </span>
+            <Select >
+              <SelectTrigger className="w-28">
+                <SelectValue  placeholder="Filter by Result" className=" placeholder:bg-zinc-100"/>
+              </SelectTrigger>
+              <SelectContent key={0}>
+                {
+                  Object.values(GameKqjCards)        
+                  .filter((key) => isNaN(Number(key))) 
+                  .map((card, index) => {
+                    return <>
+                      <SelectItem key={index} value={card.toString()}>{card.toString()}</SelectItem>
+                    </>
+                  })
+                }
+              </SelectContent>
+            </Select>      
+            {/* <div className="flex md:gap-20 flex-wrap">
+              <Button type="primary" className="w-28">
+                King
+              </Button>
+              <Button type="primary" className="w-28">
+                Queen
+              </Button>
+              <Button type="primary" className="w-28">
+                jack
+              </Button>
+            </div> */}
+          </div>
+
+          <span className={`${poppins} font-medium text-[#4D4D64] text-wrap`}>
+            Guidance: Your card suit (Spade, Club, Heart, or Diamond) will appear
+            when you click a card rank button (King, Queen, or Jack).
           </span>
-
-          <div className="flex md:gap-20 flex-wrap">
-            <Button type="primary" className="w-28">
-              King
-            </Button>
-            <Button type="primary" className="w-28">
-              Queen
-            </Button>
-            <Button type="primary" className="w-28">
-              jack
-            </Button>
-          </div>
         </div>
-
-        <span className={`${poppins} font-medium text-[#4D4D64] text-wrap`}>
-          Guidance: Your card suit (Spade, Club, Heart, or Diamond) will appear
-          when you click a card rank button (King, Queen, or Jack).
-        </span>
-      </div>
+      }
 
       <div className="w-full p-6 space-y-4 bg-gray-50 rounded-lg shadow-lg">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -220,34 +271,38 @@ export default function Page() {
             placeholder="Date"
           />
         </div>
-        <div className="flex  gap-4 items-center justify-start bg-white p-4 rounded-md shadow">
-            <Filter className="text-gray-400" />
+        <div className="flex gap-4 items-center justify-start bg-white p-4 rounded-md shadow">
+          <Filter className="text-gray-400" />
+          <div className="w-1/4">
             <Select onValueChange={value=>handleFilter("STATUS", value)} value={filterStatus}>
-            <SelectTrigger className="w-[14%]">
-              <SelectValue placeholder="Filter by Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Done">Done</SelectItem>
-              <SelectItem value="In Progress">In Progress</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select onValueChange={value=>handleFilter("RESULT", value)} value={filtersResult}>
-            <SelectTrigger className="w-[14%]">
-              <SelectValue  placeholder="Filter by Result" className=" placeholder:bg-zinc-100"/>
-            </SelectTrigger>
-            <SelectContent>
-              {
-                Object.values(GameKqjCards)        
-                .filter((key) => isNaN(Number(key))) 
-                .map((card, index) => {
-                  return <>
-                    <SelectItem key={index} value={card.toString()}>{card.toString()}</SelectItem>
-                  </>
-                })
-              }
-            </SelectContent>
-          </Select>
+              <SelectTrigger className="w-[14%]">
+                <SelectValue placeholder="Filter by Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="Done">Done</SelectItem>
+                <SelectItem value="In Progress">In Progress</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="w-1/4">
+            <Select onValueChange={value=>handleFilter("RESULT", value)} value={filtersResult}>
+              <SelectTrigger className="w-[14%]">
+                <SelectValue  placeholder="Filter by Result" className=" placeholder:bg-zinc-100"/>
+              </SelectTrigger>
+              <SelectContent key={23}>
+                {
+                  Object.values(GameKqjCards)        
+                  .filter((key) => isNaN(Number(key))) 
+                  .map((card, index) => {
+                    return <>
+                      <SelectItem key={card} value={card.toString()}>{card.toString()}</SelectItem>
+                    </>
+                  })
+                }
+              </SelectContent>
+            </Select>         
+          </div>
           {
             filterMode && <Button onClick={e=>{
               setFilterMode(false); 
@@ -288,55 +343,24 @@ export default function Page() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center">
-                  Loading...
-                </TableCell>
-              </TableRow>
-            ) : filterMode
-              ? (
-                searchedGameSession.map((session: GameSessionKqj, index: number) => (
-                  <TableRow key={index}>
-                    <TableCell className="text-center">
-                      {new Date(session.session_start_time ?? "--").toLocaleString() || "--"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {new Date(session.session_end_time ?? "--").toLocaleString() || "--"}
-                    </TableCell>
-                    <TableCell className="text-center">{session.game?.game_duration || "N/A"}</TableCell>
-                    <TableCell className="text-center">{session.id}</TableCell>
-                    <TableCell className="text-center">{"342"}</TableCell>
-                    <TableCell className="text-center">
-                      <Badge>{session.game_result_card ?? "--"}</Badge>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Tag color="green">{session.session_status}</Tag>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )
-              : (
-                gameSessions.map((session: GameSessionKqj, index: number) => (
-                  <TableRow key={index}>
-                    <TableCell className="text-center">
-                      {new Date(session.session_start_time ?? "--").toLocaleString() || "--"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {new Date(session.session_end_time ?? "--").toLocaleString() || "--"}
-                    </TableCell>
-                    <TableCell className="text-center">{session.game?.game_duration || "N/A"}</TableCell>
-                    <TableCell className="text-center">{session.id}</TableCell>
-                    <TableCell className="text-center">{"342"}</TableCell>
-                    <TableCell className="text-center">
-                      <Badge>{session.game_result_card ?? "--"}</Badge>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Tag color="green">{session.session_status}</Tag>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
+            {
+              isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center">
+                    Loading...1
+                  </TableCell>
+                </TableRow>
+              ) 
+              : filterMode 
+                ? <GameSession 
+                    onTap={(session: GameSessionKqj) => setSelectedGame(session)} 
+                    gameSessions={searchedGameSession}
+                  />
+                : <GameSession 
+                    onTap={(session: GameSessionKqj) => setSelectedGame(session)} 
+                    gameSessions={gameSessions}
+                  />
+            }
           </TableBody>
         </Table>
         </div>
@@ -347,6 +371,61 @@ export default function Page() {
         open={gameCreateOpen}
         setOpen={setGameCreateOpen}
       />
+      {
+        selectedGame &&
+          <GameControlDialog
+          game={selectedGame!}
+          open={!!selectedGame}
+          onOpenChange={(open) => !open && setSelectedGame(null)}
+          />
+      }
     </div>
   );
+}
+
+
+// import React from 'react'
+
+interface GameSessionRowType {
+  gameSessions: GameSessionKqj[], 
+  onTap: (game: GameSessionKqj) => void
+}
+
+const GameSession = (probs: GameSessionRowType) => {
+  const gameSessions: GameSessionKqj[] = probs.gameSessions as GameSessionKqj[];
+  function selectColor(status: string) : string{
+    if (status === "LIVE") return "green" 
+    else if (status === "UPCOMING") return "blue" 
+    else return "red"
+  }
+  
+  return (
+    <>
+      {
+        (
+          gameSessions.map((session: GameSessionKqj, index: number) => (
+            <TableRow key={index} onClick={e=> probs.onTap(session)}>
+              <TableCell className="text-center">
+                {new Date(session.session_start_time ?? "--").toLocaleString() || "--"}
+              </TableCell>
+              <TableCell className="text-center">
+                {new Date(session.session_end_time ?? "--").toLocaleString() || "--"}
+              </TableCell>
+              <TableCell className="text-center">{session.game?.game_duration || "N/A"}</TableCell>
+              <TableCell className="text-center">{session.id}</TableCell>
+              <TableCell className="text-center">{"342"}</TableCell>
+              <TableCell className={`text-center`}>
+                <Badge>{session.game_result_card ?? "--"}</Badge>
+              </TableCell>
+              <TableCell className="text-center">
+                {
+                  <Tag color={selectColor(session.session_status?.toString() ?? "")}>{session.session_status}</Tag>
+                }
+              </TableCell>
+            </TableRow>
+          ))
+        )
+      }
+    </>
+  )
 }

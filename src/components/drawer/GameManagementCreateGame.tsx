@@ -14,7 +14,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { ApiCall } from "@/lib/api";
-import { setCookie, getCookie } from "cookies-next/client";
+import { getCookie, getCookies, setCookie, deleteCookie, hasCookie } from 'cookies-next';
 import { toast } from "react-toastify";
 import { formatDateTime, formateDate } from "@/lib/methods";
 
@@ -83,7 +83,7 @@ export default function GameManagementCreateGame({
                 }
               }
               `,
-        veriables: {
+        variables: {
           createGamesDto: {
             admin_id: 1,
             start_date: formatDateTime(start_date),

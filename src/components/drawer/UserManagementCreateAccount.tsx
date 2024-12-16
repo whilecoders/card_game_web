@@ -50,18 +50,13 @@ export default function UserManagementCreateAccount({
         toast.error("Password do not match");
         return;
       }
-
-      console.log(city);
-      console.log(phoneNumber);
-      
-
       const response = await ApiCall({
         query: `mutation ($addUserDto: AddUserDto!) {
             addUser(addUserDto: $addUserDto) {
               id
               }
             }`,
-        veriables: {
+        variables: {
           addUserDto: {
             city,
             email,

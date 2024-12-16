@@ -7,7 +7,7 @@ import { LoginForm, LoginSchema } from "@/schema/login";
 import { poppins } from "@/utils/fonts";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button } from "antd";
-import { setCookie, getCookie } from "cookies-next/client";
+import { getCookie, getCookies, setCookie, deleteCookie, hasCookie } from 'cookies-next';
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
@@ -43,17 +43,17 @@ export default function Page() {
     // Api call to login user
     const response = await ApiCall({
       query: `query signIn($signInCredential:SignInCredential!) {
-  signIn(signInCredential: $signInCredential) {
-  access_token,
-  refresh_token,
-  user {
-    id,
-    email,
-    phone_number
-  }
-}
-}`,
-      veriables: {
+        signIn(signInCredential: $signInCredential) {
+        access_token,
+          refresh_token,
+          user {
+            id,
+            email,
+            phone_number
+          }
+        }
+      }`,
+      variables: {
         signInCredential: {
           username: data.username.trim(),
           password: data.password.trim(),
