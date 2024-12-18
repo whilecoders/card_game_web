@@ -118,7 +118,7 @@ const formatDateTime = (inputDate: string | Date): string => {
     const year = date.getFullYear();
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    const seconds = date.getSeconds() ;
+    const seconds = date.getSeconds();
     const meridiem = date.getHours() < 12 ? "AM" : "PM";
 
     const formattedTime =
@@ -129,7 +129,7 @@ const formatDateTime = (inputDate: string | Date): string => {
         minutes +
         ":" +
         (seconds < 10 ? "0" : "") +
-        seconds 
+        seconds
 
     //  if month and day is less than 10, add 0 before month
     if (month < 10 && day < 10) {
@@ -406,4 +406,3 @@ const formatDate = (date: Date): string => {
 };
 
 
-  

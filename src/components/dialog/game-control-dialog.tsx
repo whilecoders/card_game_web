@@ -323,299 +323,301 @@ export function GameControlDialog({
   }, [game.session_end_time])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[68%] p-0 m-0 border-none overflow-hidden">
-        <div className="flex h-[700px] bg-white p-0">
-          <div className="w-48 bg-muted p-4 flex flex-col space-y-2">
-            {tabs.map((tab) => (
-              <Button
-                key={tab.id}
-                variant={activeTab === tab.id ? "default" : "ghost"}
-                className="justify-start"
-                onClick={() => setActiveTab(tab.id)}
-              >
-                <tab.icon className="mr-2 h-4 w-4" />
-                {tab.label}
-              </Button>
-            ))}
-          </div>
-          <div className="flex-1 p-6 overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold mb-7">
-                Game Control - Game #{game!.id}
-              </DialogTitle>
-            </DialogHeader>
-
-            {/* Overview tab content (unchanged) */}
-            <div className={cn(activeTab === "overview" ? "block" : "hidden")}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm  flex justify-between w-full font-light">
-                      Time Remaining
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold" suppressHydrationWarning >
-                      {isClient ? gameEndremains : "Calculating..."}
-                    </div>
-                    {<Progress value={progress} className="mt-2" />}
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm flex justify-between w-full font-light">
-                      Total Bets
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{"1,234"}</div>
-                    <p className="text-xs text-muted-foreground">
-                      From {usersBets.length} users
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Bets</CardTitle>
-                  <CardDescription>Highest bets in the current game</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>User ID</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Timestamp</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {topBets.map((bet) => (
-                        <TableRow key={bet.userId}>
-                          <TableCell>{bet.userId}</TableCell>
-                          <TableCell>{bet.amount}</TableCell>
-                          <TableCell>{bet.timestamp}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent  className="max-w-[71%] p-0 m-0 border-none overflow-hidden">
+          <div className="flex h-[700px] bg-white p-0">
+            <div className="w-48 bg-muted p-4 flex flex-col space-y-2">
+              {tabs.map((tab) => (
+                <Button
+                  key={tab.id}
+                  variant={activeTab === tab.id ? "default" : "ghost"}
+                  className="justify-start"
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  <tab.icon className="mr-2 h-4 w-4" />
+                  {tab.label}
+                </Button>
+              ))}
             </div>
+            <div className="flex-1 p-6 overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold mb-7">
+                  Game Control - Game #{game!.id}
+                </DialogTitle>
+              </DialogHeader>
 
-            {/* Users tab content (unchanged) */}
-            <div className={cn(activeTab === "users" ? "block" : "hidden")}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Users and Their Bets</CardTitle>
-                  <CardDescription>Manage users and their bets in the current game</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="flex items-center space-x-2">
-                      <Button onClick={e=>onSearch(0, paginationState.pageSize)} className="bg-white shadow-xm hover:bg-slate-50" variant="default">
-                        <Search className="h-4 w-4  text-muted-foreground" />
-                      </Button>
-                      <Input
-                        placeholder="Search users..."
-                        value={searchTerm}
-                        onChange={(e) => {
-                          setSearchTerm(e.target.value); 
-                          if (!searchMode) setSearchMode(true)
-                          if (e.target.value === ""){ setSearchMode(false); getUsersBet(0, paginationState.pageSize); } }
-                        }
-                        className="w-[200px]"
-                      />
-                      {
-                        searchMode && <IoMdClose onClick={e=>{
-                            setSearchMode(false);
-                            setSearchTerm("")
-                            getUsersBet(0, paginationState.pageSize);
-                          }
-                        } className="text-3xl"/>
-                      }
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Label htmlFor="">Sort by:</Label>
-                      <Select value={sortBy} onValueChange={setSortBy}>
-                        <SelectTrigger id="sort-by" className="w-[140px]">
-                          <SelectValue placeholder="Sort by" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="name">Name</SelectItem>
-                          <SelectItem value="betAmount">Bet Amount</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                      >
-                        {sortOrder === "asc" ? "↑" : "↓"}
-                      </Button>
-                    </div>
-                  </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>User ID</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Bet Amount</TableHead>
-                        <TableHead className="text-center pr-9">Card</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                   {filteredUsers.length === 0  
-                    ? <div className="mt-9 mx-auto  flex justify-end">
-                        <p className="">No bet is found for {searchTerm} userId or name</p>
-                      </div> 
-                    : <TableBody className="">
-                      {filteredUsers.map((bet: RecordSessionKqj) => (
-                          <TableRow key={bet.id}>
-                            <TableCell>{bet.user?.id}</TableCell>
-                            <TableCell>{bet.user?.username}</TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                value={TokenValues[bet.token?.toString() as keyof typeof TokenValues]}
-                                onChange={(e) => handleRemoveBet(bet.id, Number(e.target.value))}
-                                className="w-20"
-                                readOnly
-                              />
-                            </TableCell>
-                            <TableCell className="text-center pr-9">{bet.choosen_card}</TableCell>
-                            <TableCell>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Open menu</span>
-                                    <SlOptions className="h-4 font-light w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                  <DropdownMenuItem onClick={() => handleRemoveUser(bet.user?.id ?? 0)}>
-                                    Remove User
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleRemoveBet(bet.id ?? 0, 0)}>
-                                    Remove Bet
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem onClick={() => {
-                                    setIsUserDetailsOpen(true)
-                                  }}>
-                                    View User Details
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
+              {/* Overview tab content (unchanged) */}
+              <div className={cn(activeTab === "overview" ? "block" : "hidden")}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm  flex justify-between w-full font-light">
+                        Time Remaining
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold" suppressHydrationWarning >
+                        {isClient ? gameEndremains : "Calculating..."}
+                      </div>
+                      {<Progress value={progress} className="mt-2" />}
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm flex justify-between w-full font-light">
+                        Total Bets
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{"1,234"}</div>
+                      <p className="text-xs text-muted-foreground">
+                        From {usersBets.length} users
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Top Bets</CardTitle>
+                    <CardDescription>Highest bets in the current game</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>User ID</TableHead>
+                          <TableHead>Amount</TableHead>
+                          <TableHead>Timestamp</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {topBets.map((bet) => (
+                          <TableRow key={bet.userId}>
+                            <TableCell>{bet.userId}</TableCell>
+                            <TableCell>{bet.amount}</TableCell>
+                            <TableCell>{bet.timestamp}</TableCell>
                           </TableRow>
                         ))}
-                    </TableBody>}
-                  </Table>
-                  <Pagination
-                    className="mt-10"
-                    showSizeChanger
-                    onShowSizeChange={onShowSizeChange}
-                    onChange={onPageChange}
-                    current={paginationState.currentPage}
-                    defaultCurrent={1}
-                    pageSize={paginationState.pageSize}
-                    total={totalUserBets.current}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Updated Game Actions tab content */}
-            <div className={cn(activeTab === "actions" ? "block" : "hidden")}>
-              <div className="space-y-6">
-                <Card className=" ">
-                  <CardHeader>
-                    <CardTitle className="text-2xl font-bold">Draw Result</CardTitle>
-                    <CardDescription>Set or generate the result for the current game</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4 ">
-                    {
-                      <div className="space-y-2">
-                        {/* <Select>
-                          <SelectTrigger className="w-28">
-                            <SelectValue  placeholder="Filter by Result" className=" placeholder:bg-zinc-100"/>
-                          </SelectTrigger>
-                          <SelectContent key={0}>
-                            {
-                              Object.values(GameKqjCards)        
-                                .filter((key) => isNaN(Number(key))) 
-                                .map((card, index) => {
-                                  return <>
-                                    <SelectItem key={index} value={card.toString()}>{card.toString()}</SelectItem>
-                                  </>
-                                })
-                            }
-                          </SelectContent>
-                        </Select>     */}
-                      </div>
-                    }
-                    <div className="flex space-x-2">
-                      <Button onClick={handleDrawResult} className="flex-1">
-                        <Dice className="w-4 h-4 mr-2" />
-                        Draw Result
-                      </Button>
-                      <Button variant="outline" onClick={() => setResult("")}>
-                        <RotateCcw className="w-4 h-4 mr-2" />
-                        Reset
-                      </Button>
-                    </div>
-
-                    {result && (
-                      <div className="mt-4 p-4 bg-blue-100 dark:bg-blue-800 rounded-md">
-                        <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-200">Drawn Result</h3>
-                        <p className="text-2xl font-bold text-blue-800 dark:text-blue-100">{result}</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900 dark:to-orange-900">
-                  <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-red-600 dark:text-red-300">End Game</CardTitle>
-                    <CardDescription>Immediately end the current game</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="rounded-lg border-2 border-red-400 dark:border-red-600 p-4">
-                      <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-                        <AlertCircle className="h-5 w-5" />
-                        <h3 className="font-semibold">Warning</h3>
-                      </div>
-                      <p className="mt-2 text-sm text-red-700 dark:text-red-300">
-                        Ending the game immediately will stop all ongoing bets and finalize
-                        the current state. This action cannot be undone.
-                      </p>
-                      <Button
-                        variant="destructive"
-                        className="mt-4 w-full bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
-                        onClick={handleEndGame}
-                      >
-                        End Game Immediately
-                      </Button>
-                    </div>
+                      </TableBody>
+                    </Table>
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Users tab content (unchanged) */}
+              <div className={cn(activeTab === "users" ? "block" : "hidden")}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Users and Their Bets</CardTitle>
+                    <CardDescription>Manage users and their bets in the current game</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex items-center space-x-2">
+                        <Button onClick={e=>onSearch(0, paginationState.pageSize)} className="bg-white shadow-xm hover:bg-slate-50" variant="default">
+                          <Search className="h-4 w-4  text-muted-foreground" />
+                        </Button>
+                        <Input
+                          placeholder="Search users..."
+                          value={searchTerm}
+                          onChange={(e) => {
+                            setSearchTerm(e.target.value); 
+                            if (!searchMode) setSearchMode(true)
+                            if (e.target.value === ""){ setSearchMode(false); getUsersBet(0, paginationState.pageSize); } }
+                          }
+                          className="w-[200px]"
+                        />
+                        {
+                          searchMode && <IoMdClose onClick={e=>{
+                              setSearchMode(false);
+                              setSearchTerm("")
+                              getUsersBet(0, paginationState.pageSize);
+                            }
+                          } className="text-3xl"/>
+                        }
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Label htmlFor="">Sort by:</Label>
+                        <Select value={sortBy} onValueChange={setSortBy}>
+                          <SelectTrigger id="sort-by" className="w-[140px]">
+                            <SelectValue placeholder="Sort by" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="name">Name</SelectItem>
+                            <SelectItem value="betAmount">Bet Amount</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                        >
+                          {sortOrder === "asc" ? "↑" : "↓"}
+                        </Button>
+                      </div>
+                    </div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>User ID</TableHead>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Bet Amount</TableHead>
+                          <TableHead className="text-center pr-9">Card</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                    {filteredUsers.length === 0  
+                      ? <div className="mt-9 mx-auto  flex justify-end">
+                          <p className="">No bet is found for {searchTerm} userId or name</p>
+                        </div> 
+                      : <TableBody className="">
+                        {filteredUsers.map((bet: RecordSessionKqj) => (
+                            <TableRow key={bet.id}>
+                              <TableCell>{bet.user?.id}</TableCell>
+                              <TableCell>{bet.user?.username}</TableCell>
+                              <TableCell>
+                                <Input
+                                  type="number"
+                                  value={TokenValues[bet.token?.toString() as keyof typeof TokenValues]}
+                                  onChange={(e) => handleRemoveBet(bet.id, Number(e.target.value))}
+                                  className="w-20"
+                                  readOnly
+                                />
+                              </TableCell>
+                              <TableCell className="text-center pr-9">{bet.choosen_card}</TableCell>
+                              <TableCell>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                      <span className="sr-only">Open menu</span>
+                                      <SlOptions className="h-4 font-light w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    <DropdownMenuItem onClick={() => handleRemoveUser(bet.user?.id ?? 0)}>
+                                      Remove User
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleRemoveBet(bet.id ?? 0, 0)}>
+                                      Remove Bet
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    {/* <DropdownMenuItem onClick={() => {
+                                      setIsUserDetailsOpen(true)
+                                    }}>
+                                      View User Details
+                                    </DropdownMenuItem> */}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>}
+                    </Table>
+                    <Pagination
+                      className="mt-10"
+                      showSizeChanger
+                      onShowSizeChange={onShowSizeChange}
+                      onChange={onPageChange}
+                      current={paginationState.currentPage}
+                      defaultCurrent={1}
+                      pageSize={paginationState.pageSize}
+                      total={totalUserBets.current}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Updated Game Actions tab content */}
+              <div className={cn(activeTab === "actions" ? "block" : "hidden")}>
+                <div className="space-y-6">
+                  <Card className=" ">
+                    <CardHeader>
+                      <CardTitle className="text-2xl font-bold">Draw Result</CardTitle>
+                      <CardDescription>Set or generate the result for the current game</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4 ">
+                      {
+                        <div className="space-y-2">
+                          {/* <Select>
+                            <SelectTrigger className="w-28">
+                              <SelectValue  placeholder="Filter by Result" className=" placeholder:bg-zinc-100"/>
+                            </SelectTrigger>
+                            <SelectContent key={0}>
+                              {
+                                Object.values(GameKqjCards)        
+                                  .filter((key) => isNaN(Number(key))) 
+                                  .map((card, index) => {
+                                    return <>
+                                      <SelectItem key={index} value={card.toString()}>{card.toString()}</SelectItem>
+                                    </>
+                                  })
+                              }
+                            </SelectContent>
+                          </Select>     */}
+                        </div>
+                      }
+                      <div className="flex space-x-2">
+                        <Button onClick={handleDrawResult} className="flex-1">
+                          <Dice className="w-4 h-4 mr-2" />
+                          Draw Result
+                        </Button>
+                        <Button variant="outline" onClick={() => setResult("")}>
+                          <RotateCcw className="w-4 h-4 mr-2" />
+                          Reset
+                        </Button>
+                      </div>
+
+                      {result && (
+                        <div className="mt-4 p-4 bg-blue-100 dark:bg-blue-800 rounded-md">
+                          <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-200">Drawn Result</h3>
+                          <p className="text-2xl font-bold text-blue-800 dark:text-blue-100">{result}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900 dark:to-orange-900">
+                    <CardHeader>
+                      <CardTitle className="text-2xl font-bold text-red-600 dark:text-red-300">End Game</CardTitle>
+                      <CardDescription>Immediately end the current game</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="rounded-lg border-2 border-red-400 dark:border-red-600 p-4">
+                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                          <AlertCircle className="h-5 w-5" />
+                          <h3 className="font-semibold">Warning</h3>
+                        </div>
+                        <p className="mt-2 text-sm text-red-700 dark:text-red-300">
+                          Ending the game immediately will stop all ongoing bets and finalize
+                          the current state. This action cannot be undone.
+                        </p>
+                        <Button
+                          variant="destructive"
+                          className="mt-4 w-full bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+                          onClick={handleEndGame}
+                        >
+                          End Game Immediately
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </DialogContent>
+        </DialogContent>
+      </Dialog>
       <UserDetailsModal
         user={selectedUser}
         open={isUserDetailsOpen}
-        onOpenChange={setIsUserDetailsOpen}
+        onOpenChange={e=>setIsUserDetailsOpen(e)}
         onUpdateUser={handleUpdateUser}
       />
-    </Dialog>
+    </>
   )
 }
 

@@ -18,6 +18,7 @@ import dayjs from "dayjs";
 import { formatDateTime } from "@/lib/methods";
 import { toast } from "react-toastify";
 import { GameControlDialog } from "@/components/dialog/game-control-dialog";
+import ScheduledGames from "@/components/ui/ScheduleGames";
 
 
 interface GamehistoryDataType {
@@ -50,18 +51,18 @@ export default function Page() {
       try {
          response = await ApiCall({
           query: `       
-          query getGameSessionsByDateOrToday {
-            getGameSessionsByDateOrToday {
-              id,
-              session_start_time,
-              session_end_time,
-              game_result_card,
-              session_status,
-              game {
-                game_duration
+            query getGameSessionsByDateOrToday {
+              getGameSessionsByDateOrToday {
+                id,
+                session_start_time,
+                session_end_time,
+                game_result_card,
+                session_status,
+                game {
+                  game_duration
+                }
               }
-            }
-          }`,
+            }`,
           variables: {},
         });
         //  const liveSessionResponse: ApiRespose = await ApiCall({
@@ -147,7 +148,6 @@ export default function Page() {
     }
     setSearchedGameSessions(searchedSeession)
   }
-  
   
 
   return (
@@ -254,6 +254,8 @@ export default function Page() {
           </span>
         </div>
       }
+
+      <ScheduledGames/>
 
       <div className="w-full p-6 space-y-4 bg-gray-50 rounded-lg shadow-lg">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

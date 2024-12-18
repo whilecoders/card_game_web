@@ -35,8 +35,8 @@ export function UserDetailsModal({ user, open, onOpenChange, onUpdateUser }: Use
   }
 
   return (
-    <Dialog open={true} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={open}  onOpenChange={onOpenChange}>
+      <DialogContent  className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>User Details</DialogTitle>
         </DialogHeader>

@@ -10,11 +10,11 @@ export interface Games {
     deletedAt?: Date | null;
     admin: User;
     game_type: GameType;
-    start_time: string; // Time in "HH:mm:ss" format
-    end_time: string;   // Time in "HH:mm:ss" format
+    start_time: string; 
+    end_time: string;   
     start_date: Date;
     end_date: Date;
-    game_duration: number; // Duration in milliseconds or another unit
+    game_duration: number;
     game_in_day: number;
     game_status: GameStatus;
     gameSession?: GameSessionKqj[] | null;

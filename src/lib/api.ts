@@ -1,7 +1,11 @@
 import axios from "axios";
 import { API_BASE_URL } from "./const";
+import { getCookie } from "cookies-next";
+import { redirect } from 'next/navigation'
+import { toast } from "react-toastify";
 
- export type ApiRespose = {
+
+export type ApiRespose = {
   status: boolean;
   data: any;
   message: string;
@@ -17,25 +21,24 @@ export const ApiCall = async (args: {
   };
 }): Promise<ApiRespose> => {
   try {
+    const token = getCookie('access_token')
+    if (!token) {
+      toast.error("You have been logout")
+      redirect('/login')
+    }
     const req = await axios.post(
       API_BASE_URL,
-      {
-        query: args.query,
-        variables: args.variables,
-      },
-      { headers: args.headers }
+      { query: args.query, variables: args.variables, },
+      { headers: { ...args.headers, Authorization: token } }
     );
-    
-    if (
-      req.data.data == null ||
+    if (req.data.data == null ||
       req.data.data == undefined ||
-      req.data.data == ""
-    ) {
+      req.data.data == "") {
       if (
         req.data.errors[0].extensions.originalError == undefined ||
         req.data.errors[0].extensions.originalError == null
       )
-        return { status: false, data: [], message: req.data.errors[0].message };
+      return { status: false, data: [], message: req.data.errors[0].message };
       const errorMessage = Array.isArray(
         req.data.errors[0].extensions.originalError.message
       )
