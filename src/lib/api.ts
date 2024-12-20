@@ -11,7 +11,7 @@ export type ApiRespose = {
   message: string;
 };
 
-export const ApiCall = async (args: {
+const ApiCallBase = async (args: {
   query: string;
   variables: {
     [key: string]: unknown;
@@ -21,15 +21,15 @@ export const ApiCall = async (args: {
   };
 }): Promise<ApiRespose> => {
   try {
-    const token = getCookie('access_token')
-    if (!token) {
-      toast.error("You have been logout")
-      redirect('/login')
-    }
+    // const token = getCookie('access_token')
+    // if (!token) {
+    //   toast.error("You have been logout")
+    //   redirect('/login')
+    // }
     const req = await axios.post(
       API_BASE_URL,
       { query: args.query, variables: args.variables, },
-      { headers: { ...args.headers, Authorization: token } }
+      { headers: { ...args.headers } }
     );
     if (req.data.data == null ||
       req.data.data == undefined ||
@@ -38,7 +38,7 @@ export const ApiCall = async (args: {
         req.data.errors[0].extensions.originalError == undefined ||
         req.data.errors[0].extensions.originalError == null
       )
-      return { status: false, data: [], message: req.data.errors[0].message };
+        return { status: false, data: [], message: req.data.errors[0].message };
       const errorMessage = Array.isArray(
         req.data.errors[0].extensions.originalError.message
       )
@@ -56,3 +56,29 @@ export const ApiCall = async (args: {
     }
   }
 };
+
+
+export const ApiCall = async (args: {
+  query: string;
+  variables: {
+    [key: string]: unknown;
+  };
+  headers?: {
+    [key: string]: string;
+  };
+}): Promise<ApiRespose> => {
+
+  const token = getCookie('access_token')
+  if (!token) {
+    toast.error("You have been logout")
+    redirect('/login')
+  }
+
+  const api_response = await ApiCallBase({
+    query: args.query,
+    variables: args.variables,
+    headers: { ...args.headers }
+  });
+
+  return api_response;
+}

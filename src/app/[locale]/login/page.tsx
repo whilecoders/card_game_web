@@ -29,14 +29,20 @@ export default function Page() {
 
   // Check if user is already login?
   useEffect(() => {
-    const accessToken = getCookie("access_token");
-    const refreshToken = getCookie("refresh_token");
-    const userJSON = getCookie("user") ?? "{}";
-    const user = JSON.parse(userJSON);
 
-    if (Object.keys(user).length > 0) {
-      router.replace("/en/dashboard/user-management");
-    }
+    const init = async () => {
+
+      const accessToken = getCookie("access_token");
+      const refreshToken = getCookie("refresh_token");
+      const userJSON = await getCookie("user") ?? "{}";
+      const user = JSON.parse(userJSON);
+
+      if (Object.keys(user).length > 0) {
+        router.replace("/en/dashboard/user-management");
+      }
+    };
+
+    init();
   }, []);
 
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
