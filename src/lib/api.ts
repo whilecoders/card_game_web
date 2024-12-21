@@ -11,7 +11,7 @@ export type ApiRespose = {
   message: string;
 };
 
-const ApiCallBase = async (args: {
+const ApiCall = async (args: {
   query: string;
   variables: {
     [key: string]: unknown;
@@ -21,11 +21,11 @@ const ApiCallBase = async (args: {
   };
 }): Promise<ApiRespose> => {
   try {
-    // const token = getCookie('access_token')
-    // if (!token) {
-    //   toast.error("You have been logout")
-    //   redirect('/login')
-    // }
+    const token = getCookie('access_token')
+    if (!token) {
+      toast.error("You have been logout")
+      redirect('/login')
+    }
     const req = await axios.post(
       API_BASE_URL,
       { query: args.query, variables: args.variables, },
@@ -58,27 +58,27 @@ const ApiCallBase = async (args: {
 };
 
 
-export const ApiCall = async (args: {
-  query: string;
-  variables: {
-    [key: string]: unknown;
-  };
-  headers?: {
-    [key: string]: string;
-  };
-}): Promise<ApiRespose> => {
+// export const ApiCall = async (args: {
+//   query: string;
+//   variables: {
+//     [key: string]: unknown;
+//   };
+//   headers?: {
+//     [key: string]: string;
+//   };
+// }): Promise<ApiRespose> => {
 
-  const token = getCookie('access_token')
-  if (!token) {
-    toast.error("You have been logout")
-    redirect('/login')
-  }
+//   const token = getCookie('access_token')
+//   if (!token) {
+//     toast.error("You have been logout")
+//     redirect('/login')
+//   }
 
-  const api_response = await ApiCallBase({
-    query: args.query,
-    variables: args.variables,
-    headers: { ...args.headers }
-  });
+//   const api_response = await ApiCallBase({
+//     query: args.query,
+//     variables: args.variables,
+//     headers: { ...args.headers }
+//   });
 
-  return api_response;
-}
+//   return api_response;
+// }
