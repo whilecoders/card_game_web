@@ -19,6 +19,7 @@ import { formatDateTime } from "@/lib/methods";
 import { toast } from "react-toastify";
 import { GameControlDialog } from "@/components/dialog/game-control-dialog";
 import ScheduledGames from "@/components/ui/ScheduleGames";
+import { todo } from "node:test";
 
 
 interface GamehistoryDataType {
@@ -65,23 +66,7 @@ export default function Page() {
             }`,
           variables: {},
         });
-        //  const liveSessionResponse: ApiRespose = await ApiCall({
-        //   query: `       
-        //   query getLiveGameSessions {
-        //     getLiveGameSessions {
-        //       id,
-        //       session_start_time,
-        //       session_end_time,
-        //       game_result_card,
-        //       session_status,
-        //       game {
-        //         game_duration
-        //       }
-        //     }
-        //   }`,
-        //   veriables: {},
-        // });
-        // console.log(response);
+        console.log(response);
         if (!response.status) {
           toast.error(response.message);
           return;
@@ -98,8 +83,46 @@ export default function Page() {
     },
   });
 
+  async function init() {
+    let  response: ApiRespose | undefined= undefined;
+    console.log("query running ");
+    
+    try {
+       response = await ApiCall({
+        query: `       
+          query getGameSessionsByDateOrToday {
+            getGameSessionsByDateOrToday {
+              id,
+              session_start_time,
+              session_end_time,
+              game_result_card,
+              session_status,
+              game {
+                game_duration
+              }
+            }
+          }`,
+        variables: {},
+      });
+      console.log(response);
+      if (!response.status) {
+        toast.error(response.message);
+        return;
+      }
+      const liveSession: GameSessionKqj | undefined =  (response.data?.getGameSessionsByDateOrToday as GameSessionKqj[])
+        .find((session) => session.session_status.toString() === "LIVE")
+      setCurrentLiveSession(liveSession)
+      setGameSessions(response.data?.getGameSessionsByDateOrToday as GameSessionKqj[]);
+      return response.data?.getGameSessionsByDateOrToday || [];
+    } catch {
+      toast.error(response?.message ?? "");
+      return;
+    }
+  }
+
   async function handleGameFilterByDate(date: dayjs.Dayjs)  {
-    const asDate = new Date(date.subtract(5, "hours").subtract(30, "minutes").toString())
+    // const asDate = new Date(date.subtract(5, "hours").subtract(30, "minutes").toString())
+    const asDate = new Date(date.toDate())
     const fromDate = new Date(asDate.setHours(0,0,0,0));
     const toDate = new Date(asDate.setHours(23, 59, 59, 999));
     
@@ -119,12 +142,12 @@ export default function Page() {
       }`,
       variables: {
         filter: {
-          "startDate": formatDateTime(fromDate.toString()),
-          "endDate": formatDateTime(toDate.toString()),
+          "startDate": fromDate.toString(),
+          "endDate": toDate.toString(),
         }
       },
     });
-    console.log(formatDateTime(fromDate.toString()), formatDateTime(toDate.toString()));
+    console.log(`fromDate.toString(), todo.toString()`);
     console.log(response);
     if (response.status) {
       setGameSessions(response.data.getGameSessionsByDateOrToday as GameSessionKqj[]);
@@ -148,6 +171,11 @@ export default function Page() {
     }
     setSearchedGameSessions(searchedSeession)
   }
+  
+  useEffect(() => {
+    init();
+    return ;
+  }, [])
   
 
   return (

@@ -23,7 +23,6 @@ import { useQuery } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { Games, GameSessionKqj } from '@/models/Game/game'
 
-import { formatDate } from 'date-fns'
 import { AxiosError } from 'axios'
 import { getCookie } from 'cookies-next'
 
@@ -320,7 +319,10 @@ const ScheduledGames: React.FC = () => {
             placeholder="New duration in minmuted (e.g., 8 minute)"
           />
           <DialogFooter>
-            <Button disabled={(!newDuration || newDuration === '' || isNaN(Number(newDuration))) ? true : false } onClick={handleConfirmUpdate}>Update</Button>
+            <Button 
+              disabled={(!newDuration || newDuration === '' || isNaN(Number(newDuration))) ? true : false } 
+              onClick={handleConfirmUpdate}
+            >Update</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

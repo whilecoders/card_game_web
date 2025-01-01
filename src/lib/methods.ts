@@ -4,6 +4,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { FieldErrors, FieldValues } from "react-hook-form";
 import { toast } from "react-toastify";
 import { differenceInMilliseconds, parseISO } from "date-fns";
+import { getCookie } from "cookies-next";
 
 
 /**
@@ -405,4 +406,16 @@ const formatDate = (date: Date): string => {
     return `${yy}-${mm}-${dd}T${HH}:${MM}:${SS}`;
 };
 
+
+
+
+export function getUserIdOfLoginUser({ router }: { router?: AppRouterInstance }): number | undefined {
+    const userId = getCookie("id")
+
+    if (userId === undefined || isNaN(Number(userId))) {
+        if (router) router.replace("/en/login")
+        return;
+    }
+    return Number(userId);
+}
 

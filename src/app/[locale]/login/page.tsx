@@ -1,7 +1,7 @@
 "use client";
 import { PasswordInput } from "@/components/forms/inputfileds/passwordinput";
 import { TaxtInput } from "@/components/forms/inputfileds/textinput";
-import { ApiCall } from "@/lib/api";
+import { ApiCall, ApiCallWithoutToken } from "@/lib/api";
 import { onFormError } from "@/lib/methods";
 import { LoginForm, LoginSchema } from "@/schema/login";
 import { poppins } from "@/utils/fonts";
@@ -34,14 +34,15 @@ export default function Page() {
     const userJSON = getCookie("user") ?? "{}";
     const user = JSON.parse(userJSON);
 
-    if (Object.keys(user).length > 0) {
-      router.replace("/en/dashboard/user-management");
-    }
+    // if (Object.keys(user).length > 0) {
+    //   router.replace("/en/dashboard/user-management");
+    // }
+
   }, []);
 
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
     // Api call to login user
-    const response = await ApiCall({
+    const response = await ApiCallWithoutToken({
       query: `query signIn($signInCredential:SignInCredential!) {
         signIn(signInCredential: $signInCredential) {
         access_token,
@@ -64,6 +65,8 @@ export default function Page() {
     // check for error
     if (response.status == false) {
       toast.error(response.message);
+      console.log(response);
+      
       return;
     }
 
