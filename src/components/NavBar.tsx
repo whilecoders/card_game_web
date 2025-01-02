@@ -82,7 +82,7 @@ export function NavBar() {
 
   return (
     <nav 
-      className="flex h-16  items-center gap-4 px-6 py-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-md">
+      className="flex h-16  items-center gap-4 px-6 py-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <MobileSidebar />
       
       <div className="flex items-center gap-2">

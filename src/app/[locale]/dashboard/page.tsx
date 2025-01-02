@@ -1,150 +1,155 @@
-"use client"
-import { ApiCall } from "@/lib/api";
-import { poppins } from "@/utils/fonts";
-import { useQueries } from "@tanstack/react-query";
-import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DatePickerWithRange } from "@/components/ui/date-range-picker"
+import { BriefcaseIcon, ChartBarIcon, CurrencyDollarIcon, EllipsisHorizontalIcon, UsersIcon } from "@heroicons/react/24/outline"
+import { UserGrowthChart } from "@/components/UserGrowthChart"
+import { GameActivitiesTable } from "@/components/GameActivitiesTable"
+import { ProfitLossChart } from "@/components/ProfitLossChart"
+import { TokenTransactionsTable } from "@/components/TokenTransactionsTable"
+import { WorkerActivityChart } from "@/components/WorkerActivityChart"
+import { InfoCard } from "@/components/InfoCard"
 
-const fetchData = async (queryKey: string) => {
-  return await ApiCall({
-    query: `query ${queryKey} {
-  ${queryKey}
-}`, variables: {}
-  })
-}
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+ 
 
-export default function Page() {
-  const [totalSessionCount, setTotalSessionCount] = useState(0);
-  const [finishedSessionCount, setFinishedSessionCount] = useState(0);
-  const [totalUserCount, settotalUserCount] = useState(0);
-  const [totalTokenCount, setTotalTokenCount] = useState(0);
-  const [dailyWinnersCount, setDailyWinnersCount] = useState({
-    winners: 0,
-    losers: 0,
-  });
-  const [profitAndLoss, setProfitAndLoss] = useState({
-    profit: 0,
-    loss: 0,
-    net: 0,
-  });
-
-  const queriesData = [
-    {
-      key: "getTotalSessionsToday",
-      fn: (data: number) => { setTotalSessionCount(data) }
-    },
-    {
-      key: "getFinishedSessionsToday",
-      fn: (data: number) => { setFinishedSessionCount(data) }
-    },
-    {
-      key: "getTotalUsersToday",
-      fn: (data: number) => { settotalUserCount(data) }
-    },
-    {
-      key: "getTotalTokensToday",
-      fn: (data: number) => { setTotalTokenCount(data) }
-    },
-    {
-      key: "getDailyWinnersAndLosers",
-      fn: (data: any) => { setDailyWinnersCount(data) }
-    },
-    {
-      key: "getProfitAndLoss",
-      fn: (data: any) => { setProfitAndLoss(data) }
-    },
-  ]
-
-  useQueries({
-    queries: queriesData.map((data) => ({
-      queryKey: [data.key],
-      queryFn: async () => {
-        const response = await fetchData(data.key);
-
-        if (response.status) {
-          data.fn(response.data[data.key]);
-        }
-
-        return response.data
-      }
-    }))
-  })
-
+export default function DashboardPage() {
   return (
-    <div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* <div className="w-full h-40 bg-slate-200 rounded-md"></div> */}
-          <StatisticCard data={totalSessionCount} title="Total Session" />
-          <StatisticCard data={finishedSessionCount} title="Finished Session" />
-          <StatisticCard data={totalUserCount} title="Total User" />
-          <StatisticCard data={totalTokenCount} title="Total Token" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="w-full h-80 rounded-md border-2">
-            {/* Winners */}
-            <div className="w-full h-40 rounded-md grid place-items-center">
-              <div>
-                <p className={`${poppins} text-center text-6xl`}>{dailyWinnersCount.winners}</p>
-                <p className={`${poppins} text-xs`}>Winners</p>
-              </div>
-            </div>
-            {/* Losers */}
-            <div className="w-full h-40 rounded-md grid place-items-center">
-              <div>
-                <p className={`${poppins} text-center text-6xl`}>{dailyWinnersCount.losers}</p>
-                <p className={`${poppins} text-xs`}>Losers</p>
-              </div>
-            </div>
-          </div>
-          <div className="w-full h-80 border-2 rounded-md grid place-items-center">
-            {/* Profit */}
-            <div className="w-full rounded-md grid place-items-center">
-              <div>
-                <p className={`${poppins} text-center text-6xl`}>{profitAndLoss.profit}</p>
-                <p className={`${poppins} text-xs`}>Profit</p>
-              </div>
-            </div>
-            {/* Loss */}
-            <div className="w-full rounded-md grid place-items-center">
-              <div>
-                <p className={`${poppins} text-center text-6xl`}>{profitAndLoss.loss}</p>
-                <p className={`${poppins} text-xs`}>Loss</p>
-              </div>
-            </div>
-            {/* Net */}
-            <div className="w-full rounded-md grid place-items-center">
-              <div>
-                <p className={`${poppins} text-center text-6xl`}>{profitAndLoss.net}</p>
-                <p className={`${poppins} text-xs`}>Net</p>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="p-2 bg-[#f9f8fd] min-h-screen">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <InfoCard 
+          title="Total Users" 
+          value="10,245" 
+          icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
+          trend="up"
+          description="2,500 new this month"
+        />
+        <InfoCard 
+          title="Active Users" 
+          value="8,123" 
+          icon={<ChartBarIcon className="w-6 h-6 text-green-500" />}
+          trend="up"
+          description="79% of total users"
+        />
+        <InfoCard 
+          title="Total Workers" 
+          value="1,500" 
+          icon={<BriefcaseIcon className="w-6 h-6 text-purple-500" />}
+          trend="down"
+          description="85% completion rate"
+        />
+        <InfoCard 
+          title="Revenue" 
+          value="$52,389" 
+          icon={<CurrencyDollarIcon className="w-6 h-6 text-yellow-500" />}
+          trend="up"
+          description="$8,105 from in-app purchases"
+        />
       </div>
 
-      <div className="grid lg:grid-cols-2 grid-cols-1 gap-4 mt-4">
-        <div className="grid gap-4">
-          <div className="w-full h-80 bg-slate-200 rounded-md"></div>
-          <div className="w-full h-80 bg-slate-200 rounded-md"></div>
-        </div>
-
-        <div className="grid md:grid-cols-2 grid-cols-1 gap-4 justify-start">
-          <div className="w-full h-52 bg-slate-200 rounded-md"></div>
-          <div className="w-full h-52 bg-slate-200 rounded-md"></div>
-          <div className="w-full h-52 bg-slate-200 rounded-md"></div>
-          <div className="w-full h-52 bg-slate-200 rounded-md"></div>
-          <div className="w-full h-52 bg-slate-200 rounded-md md:col-span-2"></div>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <Card className="rounded-xl shadow-sm">
+          <CardHeader className="flex flex-row items-center pt-4 justify-between">
+            <div className="text-xl font-semibold">User Growth</div>
+            <Select>
+              <SelectTrigger className=" w-[145px] text-xs">
+                <SelectValue className="" placeholder="Select a fruit" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="apple">Last 10 days</SelectItem>
+                  <SelectItem value="banana">Last 1 month</SelectItem>
+                  <SelectItem value="blueberry">Last 6 month</SelectItem>
+                  <SelectItem value="grapes">Last 1 year</SelectItem>
+                  {/* <SelectItem value="pineapple">Pineapple</SelectItem> */}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </CardHeader>
+          <CardContent className="mt-3 pb-3">
+            <UserGrowthChart />
+          </CardContent>
+        </Card>
+        <Card className="rounded-xl shadow-sm">
+          <CardHeader className="flex flex-row items-center pt-4 justify-between">
+            <div className="text-xl font-semibold">Profit & Loss</div>
+            <Select>
+              <SelectTrigger className=" w-[145px] text-xs">
+                <SelectValue className="" placeholder="Select a fruit" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="apple">Last 10 days</SelectItem>
+                  <SelectItem value="banana">Last 1 month</SelectItem>
+                  <SelectItem value="blueberry">Last 6 month</SelectItem>
+                  <SelectItem value="grapes">Last 1 year</SelectItem>
+                  {/* <SelectItem value="pineapple">Pineapple</SelectItem> */}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </CardHeader>
+          <CardContent className="mt-3 pb-3">
+            <ProfitLossChart />
+          </CardContent>
+        </Card>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <Card className="rounded-xl shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 my-2 mb-4">
+            <CardTitle className="text-xl font-semibold">Recent Game Activities</CardTitle>
+            <Button variant="link" className="text-blue-500 h-1" style={{padding: "0px"}}>View all</Button>
+          </CardHeader>
+          <CardContent>
+            <GameActivitiesTable />
+          </CardContent>
+        </Card>
+        <Card className="rounded-xl shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-xl font-semibold">Latest Token Transactions</CardTitle>
+            <Button variant="link" size="sm">View more</Button>
+          </CardHeader>
+          <CardContent>
+            <TokenTransactionsTable />
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="rounded-xl shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-xl font-semibold">Daily Worker Activity</CardTitle>
+          <div className="flex items-center space-x-2">
+            <DatePickerWithRange />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <EllipsisHorizontalIcon className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>View Details</DropdownMenuItem>
+                <DropdownMenuItem>Export Data</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <WorkerActivityChart />
+        </CardContent>
+      </Card>
     </div>
-  );
+  )
 }
 
-const StatisticCard = ({ data, title }: { title: string, data: string | number }) => {
-  return <div className="w-full h-40 rounded-md shadow-lg grid place-items-center border-2">
-    <div>
-      <p className={`${poppins} text-center text-6xl`}>{data}</p>
-      <p className={`${poppins} text-xs`}>{title}</p>
-    </div>
-  </div>
-}

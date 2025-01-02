@@ -66,10 +66,10 @@ export default function Layout({
       disableTransitionOnChange
     >
       <div className={`min-h-screen bg-background  ${inter.className}`}>
-        <NavBar />
+        <NavBar />    
         <div className="flex  h-[calc(100vh-4rem)]">
           <Sidebar className='bg-white' />
-          <main className="flex-1 bg-[#F5F6FA] overflow-auto p-6">{children}</main>
+          <main className="flex-1 bg-[#f9f8fd] overflow-auto p-6">{children}</main>
         </div>
       </div>
     </ThemeProvider>
