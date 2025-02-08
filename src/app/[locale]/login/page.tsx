@@ -7,7 +7,13 @@ import { LoginForm, LoginSchema } from "@/schema/login";
 import { poppins } from "@/utils/fonts";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button } from "antd";
-import { getCookie, getCookies, setCookie, deleteCookie, hasCookie } from 'cookies-next';
+import {
+  getCookie,
+  getCookies,
+  setCookie,
+  deleteCookie,
+  hasCookie,
+} from "cookies-next";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
@@ -29,12 +35,10 @@ export default function Page() {
 
   // Check if user is already login?
   useEffect(() => {
-
     const init = async () => {
-
       const accessToken = getCookie("access_token");
       const refreshToken = getCookie("refresh_token");
-      const userJSON = await getCookie("user") ?? "{}";
+      const userJSON = (await getCookie("user")) ?? "{}";
       const user = JSON.parse(userJSON);
 
       if (Object.keys(user).length > 0) {
@@ -68,6 +72,7 @@ export default function Page() {
     });
 
     // check for error
+    console.log(response);
     if (response.status == false) {
       toast.error(response.message);
       return;

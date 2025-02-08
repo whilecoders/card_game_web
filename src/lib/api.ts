@@ -1,9 +1,8 @@
 import axios from "axios";
 import { API_BASE_URL } from "./const";
 import { getCookie } from "cookies-next";
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 import { toast } from "react-toastify";
-
 
 export type ApiRespose = {
   status: boolean;
@@ -11,7 +10,7 @@ export type ApiRespose = {
   message: string;
 };
 
-const ApiCall = async (args: {
+export const ApiCall = async (args: {
   query: string;
   variables: {
     [key: string]: unknown;
@@ -21,19 +20,21 @@ const ApiCall = async (args: {
   };
 }): Promise<ApiRespose> => {
   try {
-    const token = getCookie('access_token')
-    if (!token) {
-      toast.error("You have been logout")
-      redirect('/login')
-    }
+    // const token = getCookie("access_token");
+    // if (!token) {
+    //   toast.error("You have been logout");
+    //   redirect("/login");
+    // }
     const req = await axios.post(
       API_BASE_URL,
-      { query: args.query, variables: args.variables, },
+      { query: args.query, variables: args.variables },
       { headers: { ...args.headers } }
     );
-    if (req.data.data == null ||
+    if (
+      req.data.data == null ||
       req.data.data == undefined ||
-      req.data.data == "") {
+      req.data.data == ""
+    ) {
       if (
         req.data.errors[0].extensions.originalError == undefined ||
         req.data.errors[0].extensions.originalError == null
@@ -57,7 +58,6 @@ const ApiCall = async (args: {
   }
 };
 
-
 // export const ApiCall = async (args: {
 //   query: string;
 //   variables: {
@@ -67,18 +67,20 @@ const ApiCall = async (args: {
 //     [key: string]: string;
 //   };
 // }): Promise<ApiRespose> => {
-
-//   const token = getCookie('access_token')
+//   const token = getCookie("access_token");
 //   if (!token) {
-//     toast.error("You have been logout")
-//     redirect('/login')
+//     toast.error("You have been logout");
+//     redirect("/login");
 //   }
 
 //   const api_response = await ApiCallBase({
 //     query: args.query,
 //     variables: args.variables,
-//     headers: { ...args.headers }
+//     headers: { ...args.headers },
 //   });
 
 //   return api_response;
-// }
+// };
+
+// 1---------------- login signin
+// 2---------------- other apis

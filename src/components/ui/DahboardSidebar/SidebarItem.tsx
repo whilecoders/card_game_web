@@ -24,4 +24,9 @@ export const sidebarItems: SidebarItemType[] = [
     url: "/dashboard/game-management",
     icon: <Icon icon="material-symbols-light:stadia-controller-outline" />,
   },
+  {
+    name: "Permission",
+    url: "/dashboard/permission",
+    icon: <Icon icon="material-symbols-light:stadia-controller-outline" />,
+  },
 ];

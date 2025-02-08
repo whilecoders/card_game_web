@@ -68,7 +68,7 @@ export default function Page() {
           take: perPageData,
         },
       });
-      
+
       if (!response.status) {
         toast.error(response.message);
         return [];
@@ -193,7 +193,7 @@ export default function Page() {
   return (
     <div>
       {/* Filter */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex gap-4 items-center w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex gap-4 items-center w-full pt-4">
         <Input
           placeholder="Search"
           style={{ width: 240 }}
