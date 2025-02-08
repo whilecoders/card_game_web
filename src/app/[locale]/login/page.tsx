@@ -1,7 +1,7 @@
 "use client";
 import { PasswordInput } from "@/components/forms/inputfileds/passwordinput";
 import { TaxtInput } from "@/components/forms/inputfileds/textinput";
-import { ApiCall } from "@/lib/api";
+// import { ApiCall, ApiCallWithoutToken } from "@/lib/api";
 import { onFormError } from "@/lib/methods";
 import { LoginForm, LoginSchema } from "@/schema/login";
 import { poppins } from "@/utils/fonts";
@@ -18,6 +18,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ApiCall } from "@/lib/api";
 
 export default function Page() {
   const methods = useForm<LoginForm>({
@@ -75,6 +76,8 @@ export default function Page() {
     console.log(response);
     if (response.status == false) {
       toast.error(response.message);
+      console.log(response);
+
       return;
     }
 

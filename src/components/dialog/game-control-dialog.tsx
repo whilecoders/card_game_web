@@ -325,7 +325,7 @@ export function GameControlDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent  className="max-w-[71%] p-0 m-0 border-none overflow-hidden">
+        <DialogContent  className="max-w-[55%] p-0 m-0 border-none overflow-hidden">
           <div className="flex h-[700px] bg-white p-0">
             <div className="w-48 bg-muted p-4 flex flex-col space-y-2">
               {tabs.map((tab) => (
