@@ -18,7 +18,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ApiCall } from "@/lib/api";
+import { ApiCall, ApiCallWihtoutToken } from "@/lib/api";
 
 export default function Page() {
   const methods = useForm<LoginForm>({
@@ -52,7 +52,7 @@ export default function Page() {
 
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
     // Api call to login user
-    const response = await ApiCall({
+    const response = await ApiCallWihtoutToken({
       query: `query signIn($signInCredential:SignInCredential!) {
         signIn(signInCredential: $signInCredential) {
         access_token,
@@ -73,10 +73,8 @@ export default function Page() {
     });
 
     // check for error
-    console.log(response);
     if (response.status == false) {
       toast.error(response.message);
-      console.log(response);
 
       return;
     }
