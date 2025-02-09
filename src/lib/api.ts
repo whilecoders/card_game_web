@@ -176,7 +176,10 @@ export async function ApiCall(args: argPayloadWithoutToken) {
 
   // step 2: if not exist redirect to login
   if (!token) {
-    redirect("/login");
+    return redirect("/login");
+  }
+  if (!refresh_token) {
+    return redirect("/login");
   }
 
   // step 3: make api call with access token
@@ -190,9 +193,6 @@ export async function ApiCall(args: argPayloadWithoutToken) {
     return response;
   }
 
-  if (!refresh_token) {
-    redirect("/login");
-  }
   const validateRefreshTokenResponse = await ApiCallWihtoutToken({
     query: `mutation Mutation($refreshToken: String!, $token: String!) {
   refreshAccessToken(refreshToken: $refreshToken, token: $token) {
@@ -211,12 +211,12 @@ export async function ApiCall(args: argPayloadWithoutToken) {
   const cookieOptions = { path: "/" };
   setCookie(
     "access_token",
-    validateRefreshTokenResponse.data.access_token,
+    validateRefreshTokenResponse.data.refreshAccessToken.access_token,
     cookieOptions
   );
   setCookie(
     "refresh_token",
-    validateRefreshTokenResponse.data.refresh_token,
+    validateRefreshTokenResponse.data.refreshAccessToken.refresh_token,
     cookieOptions
   );
 
@@ -230,5 +230,5 @@ export async function ApiCall(args: argPayloadWithoutToken) {
     return revalidatedResponse;
   }
 
-  redirect("/login");
+  return redirect("/login");
 }
