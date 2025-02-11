@@ -21,6 +21,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ApiCall, ApiRespose } from "@/lib/api";
 import { toast } from "react-toastify";
 import { formateDate } from "@/lib/methods";
+import { useRouter } from "@/i18n/routing";
+import { Role } from "@/models/Game/game";
 
 export interface UserDataType {
   id: string | number; // TODO: remove number according to requirement
@@ -39,46 +41,60 @@ export default function Page() {
   const [count, setCount] = useState(0);
   const [selectedUser, setSelectedUser] = useState<undefined | UserDataType>();
 
+  const [nameFilter, setNameFilter] = useState<String | null>();
+  const [roleFiltre, setRoleFilter] = useState<Role | null>();
+
   const perPageData = 10;
 
   const t = useTranslations("UserManagement");
 
+  const router = useRouter();
+
   // Fetch ALl Users
-  const userQuery = useQuery({
-    queryKey: ["GetAllUser", page],
+  const { refetch } = useQuery({
+    queryKey: ["GetAllUser", page, roleFiltre, nameFilter],
     queryFn: async () => {
       const response: ApiRespose = await ApiCall({
-        query: `query ($skip: Int!, $take: Int!) {
-            getAllUsers(skip: $skip, take: $take) {
-              count,
-              skip,
-              take,
-              data {
-                id,
-                username,
-                role,
-                wallet,
-                createdAt,
-                phone_number
-              }
-            }
-          }`,
+        query: `query SearchUser($userFiltersInput: UserFiltersInput!) {
+  searchUser(UserFiltersInput: $userFiltersInput) {
+    count,
+    skip,
+    take,
+    data {
+      id,
+      name,
+      username,
+      role,
+      wallet,
+      createdAt,
+      phone_number
+    }
+  }
+}`,
         variables: {
-          skip: (page - 1) * perPageData,
-          take: perPageData,
+          userFiltersInput: {
+            take: perPageData,
+            skip: (page - 1) * perPageData,
+            role: roleFiltre,
+            username: nameFilter,
+          },
         },
+        router: router,
       });
 
+      console.log(response.data);
       if (!response.status) {
-        toast.error(response.message);
-        return [];
+        // toast.error(response.message);
+        setCount(0);
+        setUserData([]);
+        return;
       }
       const apiData: {
         count: number;
         data: UserDataType[];
         take: number;
         skip: number;
-      } = response.data?.getAllUsers;
+      } = response.data?.searchUser;
 
       setCount(apiData.count);
       setUserData(apiData?.data ?? []);
@@ -190,6 +206,7 @@ export default function Page() {
       ),
     },
   ];
+
   return (
     <div>
       {/* Filter */}
@@ -197,27 +214,34 @@ export default function Page() {
         <Input
           placeholder="Search"
           style={{ width: 240 }}
-          // onChange={handleChange} TODO: what to do on change
+          onChange={async (e) => {
+            setNameFilter(e.target.value);
+          }}
           className="border-transparent focus-within:border-primary"
           prefix={<Icon icon="mdi-light:magnify" />}
         />
         <Select
           placeholder="Role"
+          defaultValue={null}
           style={{ width: 240 }}
-          // onChange={handleChange} TODO: what to do on select
+          onChange={async (e: Role) => {
+            setRoleFilter(e);
+            console.log(e);
+          }}
           options={[
-            { value: "super_admin", label: "SUPER ADMIN" },
-            { value: "admin", label: "ADMIN" },
-            { value: "user", label: "USER" },
+            { value: null, label: "NONE" },
+            { value: "SUPERADMIN", label: "SUPER ADMIN" },
+            { value: "ADMIN", label: "ADMIN" },
+            { value: "USER", label: "USER" },
           ]}
           className="border-transparent"
         />
-        <DatePicker
+        {/* <DatePicker
           style={{ width: 240 }}
           // onChange={onChange} TODO: what to do on change
           needConfirm={true}
           placeholder="Date"
-        />
+        /> */}
 
         <div className="hidden xl:block flex-1"></div>
 

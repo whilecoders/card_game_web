@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction } from "react";
 import { Icon } from "@iconify/react";
 import { ApiCall } from "@/lib/api";
 import { toast } from "react-toastify";
+import { useRouter } from "@/i18n/routing";
 
 type UserManagementEditUsernameType = {
   username: string;
@@ -25,6 +26,8 @@ export default function UserManagementEditUsername({
     setOpen(false);
   };
 
+  const router = useRouter();
+
   const handleEditUsernameForm: FormProps<UserManagementEditUsernameType>["onFinish"] =
     async (values) => {
       const { username } = values;
@@ -41,6 +44,7 @@ export default function UserManagementEditUsername({
           },
           updateUserId: userId,
         },
+        router: router,
       });
 
       // check for error

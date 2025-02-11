@@ -1,3 +1,4 @@
+"use client";
 // import { poppins } from "@/utils/fonts";
 // import DashboardDesktopSidebar from "@/components/ui/DahboardSidebar/DashboardSidebar";
 // import { Icon } from "@iconify/react";
@@ -32,7 +33,7 @@
 //           icon="material-symbols:account-circle"
 //           className="text-primary"
 //           fontSize={38}
-//         /> 
+//         />
 //       </div>
 //       <div className="flex h-[88vh] ">
 //         <DashboardDesktopSidebar />
@@ -43,15 +44,16 @@
 //   );
 // }
 
-
-
-import { Inter } from 'next/font/google'
-import { NavBar } from "@/components/NavBar"
-import { ThemeProvider } from "@/components/ThemeProvider"
+import { Inter } from "next/font/google";
+import { NavBar } from "@/components/NavBar";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { getCookie, setCookie } from "cookies-next";
 // import { Sidebar } from 'lucide-react'
-import {Sidebar} from "@/components/SideBar";
+import { Sidebar } from "@/components/SideBar";
+import { useEffect, useState } from "react";
+import { useRouter } from "@/i18n/routing";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Layout({
   children,
@@ -66,13 +68,14 @@ export default function Layout({
       disableTransitionOnChange
     >
       <div className={`min-h-screen bg-background  ${inter.className}`}>
-        <NavBar />    
+        <NavBar />
         <div className="flex  h-[calc(100vh-4rem)]">
-          <Sidebar className='bg-white' />
-          <main className="flex-1 bg-[#f9f8fd] overflow-auto p-6">{children}</main>
+          <Sidebar className="bg-white border-r-2 border-r-gray-400" />
+          <main className="flex-1 bg-[#f9f8fd] overflow-auto p-6">
+            {children}
+          </main>
         </div>
       </div>
     </ThemeProvider>
-  )
+  );
 }
-

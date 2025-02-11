@@ -25,8 +25,8 @@ export interface Games {
   DailyGame?: DailyGame[] | null;
 }
 
-
 export interface User {
+  id: number;
   name?: string | null;
   address?: string | null;
   profile?: string | null;
@@ -46,31 +46,29 @@ export interface User {
 }
 
 export enum Role {
-  SYSTEM = 'SYSTEM',
-  SUPERADMIN = 'SUPERADMIN',
-  ADMIN = 'ADMIN',
-  MASTER = 'MASTER',
-  USER = 'USER',
+  SYSTEM = "SYSTEM",
+  SUPERADMIN = "SUPERADMIN",
+  ADMIN = "ADMIN",
+  MASTER = "MASTER",
+  USER = "USER",
 }
-
 
 export enum UserStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  SUSPENDED = 'SUSPENDED',
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  SUSPENDED = "SUSPENDED",
 }
 
-
 export enum GameType {
-  TYPE_A = 'TYPE_A',
-  TYPE_B = 'TYPE_B',
+  TYPE_A = "TYPE_A",
+  TYPE_B = "TYPE_B",
   // Add more game types
 }
 
 export enum GameStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  COMPLETED = 'COMPLETED',
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  COMPLETED = "COMPLETED",
   // Add more status types
 }
 
