@@ -21,7 +21,11 @@ export function Sidebar({ className }: SidebarProps) {
           <div className="space-y-1 flex flex-col">
             <Button
               onClick={(e) => route.replace("/dashboard")}
-              variant={path === "/dashboard" ? "secondary" : "ghost"}
+              variant={
+                path.split("?").at(0)?.endsWith("/dashboard")
+                  ? "secondary"
+                  : "ghost"
+              }
               className="flex justify-start relative"
             >
               <svg
@@ -120,7 +124,12 @@ export function Sidebar({ className }: SidebarProps) {
               <div className=" absolute left-12">Game</div>
             </Button>
             <Button
-              variant={path === "" ? "secondary" : "ghost"}
+              onClick={() => route.replace("/dashboard/workers")}
+              variant={
+                path.split("?").at(0)?.endsWith("/dashboard/workers")
+                  ? "secondary"
+                  : "ghost"
+              }
               className=" justify-start relative"
             >
               <svg
