@@ -409,7 +409,7 @@ export function getUserIdOfLoginUser({
 }: {
   router?: AppRouterInstance;
 }): number | undefined {
-  const userId = getCookie("id");
+  const userId = getCookie("user");
 
   if (userId === undefined || isNaN(Number(userId))) {
     if (router) router.replace("/login");

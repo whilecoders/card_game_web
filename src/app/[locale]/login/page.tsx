@@ -79,6 +79,7 @@ export default function Page() {
     setCookie("access_token", access_token, cookieOptions);
     setCookie("refresh_token", refresh_token, cookieOptions);
     setCookie("user", JSON.stringify(user), cookieOptions);
+    setCookie("id", user.id, cookieOptions);
     toast.success("Login Successful!");
     router.replace("/dashboard/user-management");
   };

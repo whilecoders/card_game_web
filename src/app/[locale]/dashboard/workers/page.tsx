@@ -4,17 +4,7 @@ import UserManagementCreateAccount from "@/components/drawer/UserManagementCreat
 import UserManagementAccountDetails from "@/components/drawer/UserManagementAccountDetails";
 import { poppins } from "@/utils/fonts";
 import { Icon } from "@iconify/react";
-import {
-  Button,
-  DatePicker,
-  Dropdown,
-  Input,
-  MenuProps,
-  Select,
-  Space,
-  Table,
-  TableProps,
-} from "antd";
+import { Dropdown, MenuProps, Space, Table, TableProps } from "antd";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
