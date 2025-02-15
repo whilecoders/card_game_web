@@ -23,9 +23,10 @@ import { toast } from "react-toastify";
 import { formateDate } from "@/lib/methods";
 import { useRouter } from "@/i18n/routing";
 import { Role } from "@/models/Game/game";
+import WorkerManagementUpdateToken from "@/components/drawer/WorkerManagementUpdateToken";
 
 export interface UserDataType {
-  id: string | number; // TODO: remove number according to requirement
+  id: string | number;
   username: string;
   role: string;
   wallet: number;
@@ -40,6 +41,7 @@ export default function Page() {
   const [page, setPage] = useState(1);
   const [count, setCount] = useState(0);
   const [selectedUser, setSelectedUser] = useState<undefined | UserDataType>();
+  const [accountUpdateToken, setAccountUpdateToken] = useState<boolean>(false);
 
   const perPageData = 10;
 
@@ -63,6 +65,7 @@ export default function Page() {
       username,
       role,
       wallet,
+      wallet_limit,
       createdAt,
       phone_number
     }
@@ -78,7 +81,6 @@ export default function Page() {
         router: router,
       });
 
-      console.log(response.data);
       if (!response.status) {
         // toast.error(response.message);
         setCount(0);
@@ -102,11 +104,11 @@ export default function Page() {
   const items: MenuProps["items"] = [
     {
       key: "1",
-      label: t("Removeuser"),
-    },
-    {
-      key: "2",
-      label: <span className="text-red-500">Block this user</span>,
+      label: "Update User Token",
+      onClick: () => {
+        console.log(selectedUser);
+        setAccountUpdateToken(true);
+      },
     },
   ];
 
@@ -154,6 +156,20 @@ export default function Page() {
       ),
     },
     {
+      title: "Token Limit",
+      dataIndex: "wallet_limit",
+      render: (d, user) => (
+        <div
+          onClick={() => {
+            setSelectedUser(user);
+            setAccountManageOpen(true);
+          }}
+        >
+          {d}
+        </div>
+      ),
+    },
+    {
       title: "Join Date",
       dataIndex: "createdAt",
       render: (d, user) => (
@@ -186,19 +202,21 @@ export default function Page() {
       key: "username",
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       render: (_, record) => (
-        <Dropdown
-          menu={{ items }}
-          trigger={["click"]}
-          placement="bottomRight"
-          transitionName=""
-        >
-          <Space size="middle">
-            <Icon
-              icon="material-symbols:more-vert"
-              className="cursor-pointer"
-            />
-          </Space>
-        </Dropdown>
+        <div onClick={() => setSelectedUser(record)}>
+          <Dropdown
+            menu={{ items }}
+            trigger={["click"]}
+            placement="bottomRight"
+            transitionName=""
+          >
+            <Space size="middle">
+              <Icon
+                icon="material-symbols:more-vert"
+                className="cursor-pointer"
+              />
+            </Space>
+          </Dropdown>
+        </div>
       ),
     },
   ];
@@ -230,6 +248,13 @@ export default function Page() {
         open={accountManageOpen}
         setOpen={setAccountManageOpen}
         selectedUser={selectedUser}
+      />
+
+      {/* Update Token Drawer */}
+      <WorkerManagementUpdateToken
+        open={accountUpdateToken}
+        setOpen={setAccountUpdateToken}
+        userId={Number(selectedUser?.id ?? 0)}
       />
     </div>
   );
