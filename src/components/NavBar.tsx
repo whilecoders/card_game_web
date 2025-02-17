@@ -71,7 +71,7 @@ export function NavBar() {
               profile,
               email
             }
-          }`, variables: { "id": 1 } }) 
+          }`, variables: { "id": userId } }) 
         setLoggedInUser(response.data["getUserById"] as User);
         return response.data["getUserById"] as User
       } catch (error) {

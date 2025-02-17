@@ -5,6 +5,7 @@ import { FieldErrors, FieldValues } from "react-hook-form";
 import { toast } from "react-toastify";
 import { differenceInMilliseconds, parseISO } from "date-fns";
 import { getCookie } from "cookies-next";
+import { json } from "stream/consumers";
 
 
 /**
@@ -410,12 +411,12 @@ const formatDate = (date: Date): string => {
 
 
 export function getUserIdOfLoginUser({ router }: { router?: AppRouterInstance }): number | undefined {
-    const userId = getCookie("id")
-
-    if (userId === undefined || isNaN(Number(userId))) {
+    let user = getCookie("user")
+    if (!user || isNaN(Number(userId))) {
         if (router) router.replace("/en/login")
         return;
     }
+    let objUser = JSON.parse(user)
     return Number(userId);
 }
 
