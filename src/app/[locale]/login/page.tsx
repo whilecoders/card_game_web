@@ -7,18 +7,12 @@ import { LoginForm, LoginSchema } from "@/schema/login";
 import { poppins } from "@/utils/fonts";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Button } from "antd";
-import {
-  getCookie,
-  getCookies,
-  setCookie,
-  deleteCookie,
-  hasCookie,
-} from "cookies-next";
+import { getCookie, setCookie } from "cookies-next";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { ApiCall, ApiCallWihtoutToken } from "@/lib/api";
+import { useRouter } from "@/i18n/routing";
 
 export default function Page() {
   const methods = useForm<LoginForm>({
@@ -37,13 +31,11 @@ export default function Page() {
   // Check if user is already login?
   useEffect(() => {
     const init = async () => {
-      const accessToken = getCookie("access_token");
-      const refreshToken = getCookie("refresh_token");
       const userJSON = (await getCookie("user")) ?? "{}";
       const user = JSON.parse(userJSON);
 
       if (Object.keys(user).length > 0) {
-        router.replace("/en/dashboard/user-management");
+        router.replace("/dashboard/user-management");
       }
     };
 
@@ -70,6 +62,7 @@ export default function Page() {
           password: data.password.trim(),
         },
       },
+      router: router,
     });
 
     // check for error
@@ -86,8 +79,9 @@ export default function Page() {
     setCookie("access_token", access_token, cookieOptions);
     setCookie("refresh_token", refresh_token, cookieOptions);
     setCookie("user", JSON.stringify(user), cookieOptions);
+    setCookie("id", user.id, cookieOptions);
     toast.success("Login Successful!");
-    router.replace("/en/dashboard/user-management");
+    router.replace("/dashboard/user-management");
   };
 
   return (

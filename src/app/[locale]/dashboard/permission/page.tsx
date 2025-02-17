@@ -2,20 +2,111 @@
 import { formateDate } from "@/lib/methods";
 import { Divider, Dropdown, Table, TableProps, Tabs, TabsProps } from "antd";
 import { Space } from "lucide-react";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
+import { Role } from "@/models/Game/game";
+import { useRouter } from "@/i18n/routing";
+import { useQuery } from "@tanstack/react-query";
+import { ApiCall, ApiRespose } from "@/lib/api";
+import { Button, DatePicker, Input, MenuProps, Select } from "antd";
+import { permission } from "process";
+import PermisisonSwitch from "@/components/ui/PermissionSwitch";
+
+async function fetchPermission({
+  role,
+  userId,
+  router,
+}: {
+  userId: number | string | null;
+  role: string | null;
+  router: any;
+}): Promise<
+  {
+    action: string | null;
+    allowed: boolean;
+    role: string | null;
+    user: {
+      id: number;
+      username: string;
+    } | null;
+  }[]
+> {
+  if (!userId && !role) return [];
+  if (userId && role) return [];
+
+  try {
+    const response = await ApiCall({
+      query: `query GetPermissions($role: Role, $userId: Float) {
+  getPermissions(role: $role, userId: $userId) {
+  action,
+  allowed,
+  role,
+  user {
+    id,
+    username
+  }  
+  }
+}`,
+      variables: {
+        role: role,
+        userId: userId,
+      },
+      router: router,
+    });
+
+    return response.data.getPermissions;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+}
+
+// Function to get the object by key or return null if not found
+function getObjectByKey(
+  key: string,
+  data:
+    | {
+        action: string | null;
+        allowed: boolean;
+        role: string | null;
+        user: {
+          id: number;
+          username: string;
+        } | null;
+      }[]
+    | null
+): {
+  action: string | null;
+  allowed: boolean;
+  role: string | null;
+  user: {
+    id: number;
+    username: string;
+  } | null;
+} | null {
+  if (!data) return null;
+  const result = data.find((item) => item.action === key);
+  return result || null;
+}
 
 export default function Permission() {
   const [accountManageOpen, setAccountManageOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<undefined | UserDataType>();
 
   const TabItems: TabsProps["items"] = [
     {
       key: "1",
       label: "USER",
       children: accountManageOpen ? (
-        <UserPermissionEdit setAccountManageOpen={setAccountManageOpen} />
+        <UserPermissionEdit
+          setAccountManageOpen={setAccountManageOpen}
+          selectedUser={selectedUser}
+        />
       ) : (
-        <UserPermission setAccountManageOpen={setAccountManageOpen} />
+        <UserPermission
+          setAccountManageOpen={setAccountManageOpen}
+          setSelectedUser={setSelectedUser}
+        />
       ),
     },
     {
@@ -50,99 +141,75 @@ export interface UserDataType {
   phone_number: string;
 }
 
-const userData: UserDataType[] = [
-  {
-    createdAt: formateDate(new Date()),
-    id: 1,
-    phone_number: "8899889988",
-    role: "Admin",
-    username: "super_admin",
-    wallet: 234,
-  },
-  {
-    createdAt: formateDate(new Date()),
-    id: 1,
-    phone_number: "8899889988",
-    role: "Admin",
-    username: "super_admin",
-    wallet: 234,
-  },
-  {
-    createdAt: formateDate(new Date()),
-    id: 1,
-    phone_number: "8899889988",
-    role: "Admin",
-    username: "super_admin",
-    wallet: 234,
-  },
-  {
-    createdAt: formateDate(new Date()),
-    id: 1,
-    phone_number: "8899889988",
-    role: "Admin",
-    username: "super_admin",
-    wallet: 234,
-  },
-  {
-    createdAt: formateDate(new Date()),
-    id: 1,
-    phone_number: "8899889988",
-    role: "Admin",
-    username: "super_admin",
-    wallet: 234,
-  },
-  {
-    createdAt: formateDate(new Date()),
-    id: 1,
-    phone_number: "8899889988",
-    role: "Admin",
-    username: "super_admin",
-    wallet: 234,
-  },
-  {
-    createdAt: formateDate(new Date()),
-    id: 1,
-    phone_number: "8899889988",
-    role: "Admin",
-    username: "super_admin",
-    wallet: 234,
-  },
-  {
-    createdAt: formateDate(new Date()),
-    id: 1,
-    phone_number: "8899889988",
-    role: "Admin",
-    username: "super_admin",
-    wallet: 234,
-  },
-  {
-    createdAt: formateDate(new Date()),
-    id: 1,
-    phone_number: "8899889988",
-    role: "Admin",
-    username: "super_admin",
-    wallet: 234,
-  },
-  {
-    createdAt: formateDate(new Date()),
-    id: 1,
-    phone_number: "8899889988",
-    role: "Admin",
-    username: "super_admin",
-    wallet: 234,
-  },
-];
-
 function UserPermission({
   setAccountManageOpen,
+  setSelectedUser,
 }: {
   setAccountManageOpen: Dispatch<SetStateAction<boolean>>;
+  setSelectedUser: Dispatch<SetStateAction<undefined | UserDataType>>;
 }) {
-  const [selectedUser, setSelectedUser] = useState<undefined | UserDataType>();
+  const [userData, setUserData] = useState<UserDataType[]>([]);
   const [page, setPage] = useState(1);
   const [count, setCount] = useState(0);
 
+  const [nameFilter, setNameFilter] = useState<String | null>();
+  const [roleFiltre, setRoleFilter] = useState<Role | null>();
+
   const perPageData = 5;
+
+  const router = useRouter();
+
+  // Fetch ALl Users
+  const { refetch } = useQuery({
+    queryKey: ["GetAllUser", page, roleFiltre, nameFilter],
+    queryFn: async () => {
+      const response: ApiRespose = await ApiCall({
+        query: `query SearchUser($userFiltersInput: UserFiltersInput!) {
+    searchUser(UserFiltersInput: $userFiltersInput) {
+      count,
+      skip,
+      take,
+      data {
+        id,
+        name,
+        username,
+        role,
+        wallet,
+        createdAt,
+        phone_number
+      }
+    }
+  }`,
+        variables: {
+          userFiltersInput: {
+            take: perPageData,
+            skip: (page - 1) * perPageData,
+            role: roleFiltre,
+            username: nameFilter,
+          },
+        },
+        router: router,
+      });
+
+      if (!response.status) {
+        // toast.error(response.message);
+        setCount(0);
+        setUserData([]);
+        return;
+      }
+      const apiData: {
+        count: number;
+        data: UserDataType[];
+        take: number;
+        skip: number;
+      } = response.data?.searchUser;
+
+      setCount(apiData.count);
+      setUserData(apiData?.data ?? []);
+
+      return apiData?.data ?? [];
+    },
+  });
 
   const columns: TableProps<UserDataType>["columns"] = [
     {
@@ -215,30 +282,45 @@ function UserPermission({
         </div>
       ),
     },
-    // {
-    //   title: "",
-    //   key: "username",
-    //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    //   render: (_, record) => (
-    //     <Dropdown
-    //       menu={{ items }}
-    //       trigger={["click"]}
-    //       placement="bottomRight"
-    //       transitionName=""
-    //     >
-    //       <Space size="middle">
-    //         <Icon
-    //           icon="material-symbols:more-vert"
-    //           className="cursor-pointer"
-    //         />
-    //       </Space>
-    //     </Dropdown>
-    //   ),
-    // },
   ];
 
   return (
     <div>
+      {/* Filter */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex gap-4 items-center w-full pt-4">
+        <Input
+          placeholder="Search"
+          style={{ width: 240 }}
+          onChange={async (e) => {
+            setNameFilter(e.target.value);
+          }}
+          className="border-transparent focus-within:border-primary"
+          prefix={<Icon icon="mdi-light:magnify" />}
+        />
+        <Select
+          placeholder="Role"
+          defaultValue={null}
+          style={{ width: 240 }}
+          onChange={async (e: Role) => {
+            setRoleFilter(e);
+          }}
+          options={[
+            { value: null, label: "NONE" },
+            { value: "SUPERADMIN", label: "SUPER ADMIN" },
+            { value: "ADMIN", label: "ADMIN" },
+            { value: "USER", label: "USER" },
+          ]}
+          className="border-transparent"
+        />
+        {/* <DatePicker
+          style={{ width: 240 }}
+          // onChange={onChange} TODO: what to do on change
+          needConfirm={true}
+          placeholder="Date"
+        /> */}
+      </div>
+
+      <div className="hidden xl:block flex-1"></div>
       {/* Table */}
       <div className="overflow-scroll">
         <Table<UserDataType>
@@ -258,118 +340,180 @@ function UserPermission({
   );
 }
 
-// TODO: Temp remove after use
-const permissionList = [
+interface PermissionData {
+  label: string;
+  key: string;
+  allowed: boolean;
+}
+
+interface Permission {
+  name: string;
+  permission: PermissionData[];
+}
+
+const permissionList: Permission[] = [
   {
-    name: "Role Name",
-    enabled: false,
+    name: "Wallet Permission",
+    permission: [
+      {
+        label: "Create Wallet",
+        key: "permission_1",
+        allowed: true,
+      },
+      {
+        label: "Update Wallet",
+        key: "permission_2",
+        allowed: true,
+      },
+      {
+        label: "Delete Wallet",
+        key: "permission_3",
+        allowed: true,
+      },
+    ],
   },
   {
-    name: "Permission Name",
-    enabled: false,
+    name: "User Permission",
+    permission: [
+      {
+        label: "Create User",
+        key: "permission_4",
+        allowed: true,
+      },
+      {
+        label: "Update User",
+        key: "permission_5",
+        allowed: true,
+      },
+      {
+        label: "Delete User",
+        key: "permission_6",
+        allowed: true,
+      },
+    ],
   },
   {
-    name: "Permission Name",
-    enabled: false,
+    name: "Game Permission",
+    permission: [
+      {
+        label: "Create Game",
+        key: "permission_7",
+        allowed: true,
+      },
+      {
+        label: "Update Game",
+        key: "permission_8",
+        allowed: true,
+      },
+      {
+        label: "Delete Game",
+        key: "permission_9",
+        allowed: true,
+      },
+    ],
   },
   {
-    name: "Permission Name",
-    enabled: false,
-  },
-  {
-    name: "Permission Name",
-    enabled: false,
-  },
-  {
-    name: "Permission Name",
-    enabled: false,
-  },
-  {
-    name: "Permission Name",
-    enabled: false,
-  },
-  {
-    name: "Permission Name",
-    enabled: false,
+    name: "Other Permission",
+    permission: [
+      {
+        label: "Permission one",
+        key: "permission_10",
+        allowed: true,
+      },
+      {
+        label: "Permission one",
+        key: "permission_11",
+        allowed: true,
+      },
+      {
+        label: "Permission one",
+        key: "permission_12",
+        allowed: true,
+      },
+    ],
   },
 ];
 
 function UserPermissionEdit({
   setAccountManageOpen,
+  selectedUser,
 }: {
   setAccountManageOpen: Dispatch<SetStateAction<boolean>>;
+  selectedUser: undefined | UserDataType;
 }) {
+  const [permissionStore, setPermissionStore] = useState<
+    | null
+    | {
+        action: string | null;
+        allowed: boolean;
+        role: string | null;
+        user: {
+          id: number;
+          username: string;
+        } | null;
+      }[]
+  >();
+
+  const router = useRouter();
+  useEffect(() => {
+    (async () => {
+      const permissionsRes = await fetchPermission({
+        userId: selectedUser?.id ?? null,
+        role: null,
+        router: router,
+      });
+
+      setPermissionStore(permissionsRes);
+    })();
+  }, [selectedUser]);
+
   return (
     <div className=" px-4">
-      <div className="flex justify-between">
-        <h3 className="font-bold">Edit Roles</h3>
+      <div className="flex justify-start gap-2">
         <Icon
-          icon="material-symbols:close-small-rounded"
+          icon="material-symbols:arrow-back-rounded"
           width="24"
           height="24"
           onClick={() => setAccountManageOpen(false)}
           className="cursor-pointer"
         />
+        <h3 className="font-bold">Edit Roles</h3>
       </div>
       <Divider dashed className="bg-black" />
 
-      <section className="flex md:flex-row flex-col gap-8">
-        <div className="border-2 border-gray-500 p-2 rounded-md grow shadow">
-          <h3 className="font-bold text-xl">Primary Roles</h3>
-          <div className="flex mt-4 flex-col gap-4">
-            {permissionList.map((v) => {
-              return (
-                <div className="flex flex-between items-center">
-                  <label className="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" value="" className="sr-only peer" />
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-                    <span className="ms-3 text-lg font-medium text-gray-900 dark:text-gray-300">
-                      Toggle me
-                    </span>
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="border-2 border-gray-500 p-2 rounded-md grow shadow">
-          <h3 className="font-bold text-xl">Wallet Roles</h3>
-          <div className="flex mt-4 flex-col gap-4">
-            {permissionList.map((v) => {
-              return (
-                <div className="flex flex-between items-center">
-                  <label className="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" value="" className="sr-only peer" />
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-                    <span className="ms-3 text-lg font-medium text-gray-900 dark:text-gray-300">
-                      Toggle me
-                    </span>
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="border-2 border-gray-500 p-2 rounded-md grow shadow">
-          <h3 className="font-bold text-xl">Other Roles</h3>
-          <div className="flex mt-4 flex-col gap-4">
-            {permissionList.map((v) => {
-              return (
-                <div className="flex flex-between items-center">
-                  <label className="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" value="" className="sr-only peer" />
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-                    <span className="ms-3 text-lg font-medium text-gray-900 dark:text-gray-300">
-                      Toggle me
-                    </span>
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+      <section className="flex md:flex-row flex-col gap-8 flex-wrap">
+        {permissionList.map((permissionGroup, idx) => {
+          return (
+            <div
+              className="border-2 border-gray-500 p-2 rounded-md w-[300px] shadow"
+              key={idx}
+            >
+              <h3 className="font-bold text-xl">{permissionGroup.name}</h3>
+              <div className="flex mt-4 flex-col gap-4">
+                {permissionGroup.permission.map((p, i) => {
+                  return (
+                    <div className="flex flex-between items-center" key={i}>
+                      <PermisisonSwitch
+                        checked={
+                          getObjectByKey(p.key, permissionStore ?? null)
+                            ?.allowed || false
+                        }
+                        permission_key={p.key}
+                        label={p.label}
+                        role={null}
+                        userId={
+                          typeof selectedUser?.id == "number"
+                            ? selectedUser.id
+                            : parseInt(selectedUser!.id)
+                        }
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
       </section>
     </div>
   );
@@ -380,33 +524,33 @@ function RolePermission() {
     {
       key: "1",
       label: "SYSTEM",
-      children: <ChangeRolePermission />,
+      children: <ChangeRolePermission role="SYSTEM" />,
     },
     {
       key: "2",
       label: "SUPERADMIN",
-      children: <ChangeRolePermission />,
+      children: <ChangeRolePermission role="SUPERADMIN" />,
     },
     {
       key: "3",
       label: "ADMIN",
-      children: <ChangeRolePermission />,
+      children: <ChangeRolePermission role="ADMIN" />,
     },
     {
       key: "4",
       label: "MASTER",
-      children: <ChangeRolePermission />,
+      children: <ChangeRolePermission role="MASTER" />,
     },
-    {
-      key: "5",
-      label: "USER",
-      children: <ChangeRolePermission />,
-    },
-    {
-      key: "6",
-      label: "GUEST",
-      children: <ChangeRolePermission />,
-    },
+    // {
+    //   key: "5",
+    //   label: "USER",
+    //   children: <ChangeRolePermission role="USER" />,
+    // },
+    // {
+    //   key: "6",
+    //   label: "GUEST",
+    //   children: <ChangeRolePermission role="GUEST" />,
+    // },
   ];
 
   const onTabChange = (key: string) => {};
@@ -427,22 +571,63 @@ function RolePermission() {
   );
 }
 
-function ChangeRolePermission() {
+function ChangeRolePermission({ role }: { role: string }) {
+  const [permissionStore, setPermissionStore] = useState<
+    | null
+    | {
+        action: string | null;
+        allowed: boolean;
+        role: string | null;
+        user: {
+          id: number;
+          username: string;
+        } | null;
+      }[]
+  >();
+
+  const router = useRouter();
+  useEffect(() => {
+    (async () => {
+      const permissionsRes = await fetchPermission({
+        userId: null,
+        role: role,
+        router: router,
+      });
+
+      setPermissionStore(permissionsRes);
+    })();
+  }, []);
+
   return (
-    <div className="flex mt-4 flex-col gap-4">
-      {permissionList.map((v) => {
+    <section className="flex md:flex-row flex-col gap-8 flex-wrap">
+      {permissionList.map((permissionGroup, idx) => {
         return (
-          <div className="flex flex-between items-center">
-            <label className="inline-flex items-center cursor-pointer">
-              <input type="checkbox" value="" className="sr-only peer" />
-              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-              <span className="ms-3 text-lg font-medium text-gray-900 dark:text-gray-300">
-                Toggle me
-              </span>
-            </label>
+          <div
+            className="border-2 border-gray-500 p-2 rounded-md w-[300px] shadow"
+            key={idx}
+          >
+            <h3 className="font-bold text-xl">{permissionGroup.name}</h3>
+            <div className="flex mt-4 flex-col gap-4">
+              {permissionGroup.permission.map((p, i) => {
+                return (
+                  <div className="flex flex-between items-center" key={i}>
+                    <PermisisonSwitch
+                      checked={
+                        getObjectByKey(p.key, permissionStore ?? null)
+                          ?.allowed || false
+                      }
+                      permission_key={p.key}
+                      label={p.label}
+                      role={role}
+                      userId={null}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </div>
         );
       })}
-    </div>
+    </section>
   );
 }

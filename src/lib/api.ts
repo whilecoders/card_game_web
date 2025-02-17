@@ -18,6 +18,7 @@ type argPayloadWithoutToken = {
   headers?: {
     [key: string]: string;
   };
+  router: any;
 };
 
 export const ApiCallWihtoutToken = async (
@@ -64,7 +65,7 @@ const ApiCallWithToken = async (
     const req = await axios.post(
       API_BASE_URL,
       { query: args.query, variables: args.variables },
-      { headers: { ...args.headers } }
+      { headers: { ...args.headers, Authorization: args.token } }
     );
     if (
       req.data.data == null ||
@@ -169,26 +170,28 @@ const ApiCallWithToken = async (
 // 1---------------- login signin
 // 2---------------- other apis
 
-export async function ApiCall(args: argPayloadWithoutToken) {
+export async function ApiCall(
+  args: argPayloadWithoutToken
+): Promise<ApiRespose> {
   // step 1: Get access token
   const token = getCookie("access_token");
   const refresh_token = getCookie("refresh_token");
 
   // step 2: if not exist redirect to login
   if (!token) {
-    return redirect("/login");
+    return args.router.replace("/login");
   }
   if (!refresh_token) {
-    return redirect("/login");
+    return args.router.replace("/login");
   }
-
   // step 3: make api call with access token
   const response = await ApiCallWithToken({ ...args, token: token });
-
   // step 4: if token expires revalidate token (request for new token)
   if (
-    response.message != "Invalid token payload" &&
-    response.message != "'Error verifying token'"
+    !(
+      response.message == "Invalid token payload" ||
+      response.message == "Error verifying token"
+    )
   ) {
     return response;
   }
@@ -202,10 +205,14 @@ export async function ApiCall(args: argPayloadWithoutToken) {
 }`,
     variables: { refreshToken: refresh_token, token: token },
     headers: args.headers,
+    router: args.router,
   });
 
   // step 5: if step 4 fail redirect to login
-  if (!validateRefreshTokenResponse.data) redirect("/login");
+  if (!validateRefreshTokenResponse || !validateRefreshTokenResponse.status) {
+    // return redirect("/login");
+    return args.router.replace("/login");
+  }
 
   // step 6: if step 4 success save new token (refresh and access) on client
   const cookieOptions = { path: "/" };
@@ -224,11 +231,13 @@ export async function ApiCall(args: argPayloadWithoutToken) {
   const revalidatedResponse = await ApiCallWithToken({ ...args, token: token });
 
   if (
-    revalidatedResponse.message != "Invalid token payload" &&
-    revalidatedResponse.message != "'Error verifying token'"
+    !(
+      revalidatedResponse.message == "Invalid token payload" ||
+      revalidatedResponse.message == "Error verifying token"
+    )
   ) {
     return revalidatedResponse;
   }
 
-  return redirect("/login");
+  return args.router.replace("/login");
 }

@@ -1,18 +1,69 @@
+import { UserDataType } from "@/app/[locale]/dashboard/permission/page";
+import { useRouter } from "@/i18n/routing";
+import { ApiCall } from "@/lib/api";
+import { getUserIdOfLoginUser } from "@/lib/methods";
 import { poppins } from "@/utils/fonts";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Button, Drawer, Input, Modal, Tag } from "antd";
-import { Dispatch, SetStateAction } from "react";
+import { Button, Drawer, Input, InputNumber, Modal, Tag } from "antd";
+import { getCookie } from "cookies-next";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function UserManagementManageAccount({
   open,
   onClose = () => {},
   setOpen,
+  selectedUser,
 }: {
   open: boolean;
   onClose?: () => void;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  selectedUser: UserDataType | undefined;
 }) {
   const [blockUserConfirmModal, contextHolder] = Modal.useModal();
+  const tokenInput = useRef<HTMLInputElement>(null);
+  const [workerToken, setWorkerToken] = useState(0);
+  const [userToken, setUserToken] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      if (selectedUser && selectedUser.id) {
+        const response = await ApiCall({
+          query: `query Query($getUserByIdId: Int!) {
+            getUserById(id: $getUserByIdId) {
+              wallet  
+              }
+              }`,
+          router: router,
+          variables: {
+            getUserByIdId: selectedUser.id,
+          },
+        });
+        if (!response.status) {
+          toast.error(`Error Getting User Token: ${response.message}`);
+        }
+        setUserToken(response.data.getUserById?.wallet ?? 0);
+      }
+      const workerId = getCookie("id");
+      if (Number(workerId) && !isNaN(Number(workerId))) {
+        const response = await ApiCall({
+          query: `query Query($getUserByIdId: Int!) {
+            getUserById(id: $getUserByIdId) {
+              wallet  
+              }
+              }`,
+          router: router,
+          variables: {
+            getUserByIdId: Number(workerId),
+          },
+        });
+        if (!response.status) {
+          toast.error(`Error Getting Worker Token: ${response.message}`);
+        }
+        setWorkerToken(response.data.getUserById?.wallet ?? 0);
+      }
+    })();
+  }, []);
 
   const BlockUserConfirm = () => {
     blockUserConfirmModal.confirm({
@@ -32,6 +83,142 @@ export default function UserManagementManageAccount({
   const handleClose = () => {
     onClose();
     setOpen(false);
+  };
+
+  const router = useRouter();
+
+  type UpdateTokenPayload = { updateType: "add" | "remove" };
+  const handleUpdateToken = async ({ updateType }: UpdateTokenPayload) => {
+    if (!selectedUser || !selectedUser.id) return toast.error("Unknown user");
+    const amount = tokenInput.current?.value;
+
+    if (!amount || Number(amount) <= 0)
+      return toast.error("Input a valid Token Amount");
+
+    try {
+      // Get User wallet amount
+      let res = await ApiCall({
+        query: `query Query($getUserByIdId: Int!) {
+  getUserById(id: $getUserByIdId) {
+  wallet  
+  }
+}`,
+        router: router,
+        variables: {
+          getUserByIdId: selectedUser.id,
+        },
+      });
+      if (!res.status) {
+        return toast.error(res.message);
+      }
+      const walletAmount = res.data.getUserById.wallet;
+
+      if (updateType == "add") {
+        // Get Master Wallet Amount
+        // const workerUserId = getUserIdOfLoginUser({ router: router });
+        const workerUserId = getCookie("id");
+
+        res = await ApiCall({
+          query: `query Query($getUserByIdId: Int!) {
+  getUserById(id: $getUserByIdId) {
+  wallet,
+  id,
+  username
+  }
+}`,
+          router: router,
+          variables: {
+            getUserByIdId: Number(workerUserId),
+          },
+        });
+        if (!res.status) {
+          return toast.error(res.message);
+        }
+        const workerWalletAmount = res.data.getUserById.wallet;
+        if (
+          !workerWalletAmount ||
+          Number(workerWalletAmount) < Number(amount)
+        ) {
+          return toast.error("You don't have enough token to provide");
+        }
+
+        // Update User token
+        res = await ApiCall({
+          query: `mutation UpdateUser($updateUserId: Int!, $updateUserDto: UpdateUserDto!) {
+updateUser(id: $updateUserId, updateUserDto: $updateUserDto) {
+  id,
+  wallet
+}
+}`,
+          variables: {
+            updateUserDto: {
+              wallet: Number(walletAmount) + Number(amount),
+            },
+            updateUserId: Number(selectedUser.id),
+          },
+          router: router,
+        });
+        if (!res.status) {
+          return toast.error(res.message);
+        }
+
+        // Subtract from woker token
+        res = await ApiCall({
+          query: `mutation UpdateUser($updateUserId: Int!, $updateUserDto: UpdateUserDto!) {
+updateUser(id: $updateUserId, updateUserDto: $updateUserDto) {
+id,
+wallet
+}
+}`,
+          variables: {
+            updateUserDto: {
+              wallet: Number(workerWalletAmount) - Number(amount),
+            },
+            updateUserId: Number(workerUserId),
+          },
+          router: router,
+        });
+        if (!res.status) {
+          return toast.error(res.message);
+        }
+
+        toast.success("Successfully updated token");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        if (Number(walletAmount) < Number(amount)) {
+          return toast.error("User don't have enough token to be removed");
+        }
+
+        // Update User token
+        res = await ApiCall({
+          query: `mutation UpdateUser($updateUserId: Int!, $updateUserDto: UpdateUserDto!) {
+updateUser(id: $updateUserId, updateUserDto: $updateUserDto) {
+  id,
+  wallet
+}
+}`,
+          variables: {
+            updateUserDto: {
+              wallet: Number(walletAmount) - Number(amount),
+            },
+            updateUserId: Number(selectedUser.id),
+          },
+          router: router,
+        });
+        if (!res.status) {
+          return toast.error(res.message);
+        }
+        toast.success("Successfully updated token");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+    } catch (error) {
+      toast.error("Unknown error occured");
+      console.log(error);
+    }
   };
 
   return (
@@ -62,7 +249,7 @@ export default function UserManagementManageAccount({
 
       <div className="px-8 text-end">
         <Tag className="rounded-full text-base" color="orange">
-          You have <span className="underline">450</span> Token left.
+          You have <span className="underline">{workerToken}</span> Token left.
         </Tag>
       </div>
 
@@ -70,22 +257,30 @@ export default function UserManagementManageAccount({
         <div>
           <h3 className="font-bold text-xl">Token Management</h3>
           <p className="text-sm text-slate-500">
-            Adjust user tokens for the card game (Limit: 1,000 tokens)
+            Adjust user tokens for the card game
           </p>
         </div>
         <div className="mt-4 flex flex-col">
           <span className="text-sm font-semibold">User:</span>
-          <span className="text-xl font-semibold">838 Token</span>
+          <span className="text-xl font-semibold">{userToken} Token</span>
           <span className="mt-4 text-slate-500">
-            340 tokens remaining until limit
+            {/* 340 tokens remaining until limit */}
           </span>
         </div>
         <div className="flex gap-2 mt-4">
-          <Input placeholder="Amount" width={50} />
-          <Button type="primary" icon={<Icon icon="ic:baseline-plus" />}>
+          <InputNumber placeholder="Amount" width={50} ref={tokenInput} />
+          <Button
+            type="primary"
+            icon={<Icon icon="ic:baseline-plus" />}
+            onClick={() => handleUpdateToken({ updateType: "add" })}
+          >
             Add
           </Button>
-          <Button type="primary" icon={<Icon icon="ic:baseline-minus" />}>
+          <Button
+            type="primary"
+            icon={<Icon icon="ic:baseline-minus" />}
+            onClick={() => handleUpdateToken({ updateType: "remove" })}
+          >
             Remove
           </Button>
         </div>

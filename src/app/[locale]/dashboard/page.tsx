@@ -1,3 +1,4 @@
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,8 +31,91 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ApiCall } from "@/lib/api";
+import { useRouter } from "@/i18n/routing";
+import { useState } from "react";
+import { useQueries } from "@tanstack/react-query";
 
 export default function DashboardPage() {
+  const [todaySession, setTodaySession] = useState(0);
+  const [finishedSession, setFinishedSession] = useState(0);
+  const [upcomingSession, setUpcomingSession] = useState(0);
+  const [currentSession, setCurrentSession] = useState(0);
+
+  const [totalUser, setTotalUser] = useState(0);
+  const [dailyWinner, setDailyWinner] = useState(0);
+  const [todayRevenue, setTodayRevenue] = useState(0);
+
+  const router = useRouter();
+
+  const fetchData = async (queryKey: string) => {
+    return await ApiCall({
+      query: `query ${queryKey} {
+    ${queryKey}
+  }`,
+      variables: {},
+      router: router,
+    });
+  };
+
+  const sessionQueriesData = [
+    {
+      key: "getTotalSessionsDateOrToday",
+      fn: (data: number) => {
+        setTodaySession(data);
+      },
+    },
+    {
+      key: "getFinishedSessionsByDateOrToday",
+      fn: (data: number) => {
+        setFinishedSession(data);
+      },
+    },
+    {
+      key: "getUpcomingSessions",
+      fn: (data: [Object]) => {
+        setUpcomingSession(data.length ?? 0);
+      },
+    },
+    {
+      key: "getCurrentRunningSessions",
+      fn: (data: [object]) => {
+        setCurrentSession(data.length ?? 0);
+      },
+    },
+    {
+      key: "getTotalUsersByDateOrToday",
+      fn: (data: number) => {
+        setTotalUser(data);
+      },
+    },
+    {
+      key: "getDailyWinnersAndLosers",
+      fn: (data: { winners: number; losers: number }) => {
+        setCurrentSession(data.winners);
+      },
+    },
+    {
+      key: "getTotalTokensToday",
+      fn: (data: number) => {
+        setTodayRevenue(data);
+      },
+    },
+  ];
+
+  useQueries({
+    queries: sessionQueriesData.map((data) => ({
+      queryKey: [data.key],
+      queryFn: async () => {
+        const response = await fetchData(data.key);
+        if (response.status) {
+          data.fn(response.data[data.key]);
+        }
+        return response.data;
+      },
+    })),
+  });
+
   return (
     <div className="p-2 bg-[#f9f8fd] min-h-screen">
       <div className="flex justify-between items-center mb-8">
@@ -41,35 +125,78 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <InfoCard
           title="Total Users"
-          value="10,245"
+          value={totalUser.toString()}
           icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           trend="up"
           description="2,500 new this month"
         />
         <InfoCard
-          title="Active Users"
-          value="8,123"
+          title="Daily Winner"
+          value={dailyWinner.toString()}
           icon={<ChartBarIcon className="w-6 h-6 text-green-500" />}
           trend="up"
           description="79% of total users"
         />
         <InfoCard
-          title="Total Workers"
+          title="Todays Games"
           value="1,500"
           icon={<BriefcaseIcon className="w-6 h-6 text-purple-500" />}
-          trend="down"
+          trend="up"
           description="85% completion rate"
         />
         <InfoCard
           title="Revenue"
-          value="$52,389"
+          value={todayRevenue.toString()}
           icon={<CurrencyDollarIcon className="w-6 h-6 text-yellow-500" />}
           trend="up"
           description="$8,105 from in-app purchases"
         />
+
+        {/* <InfoCard
+          title="Todays Winners"
+          value="1,500"
+          icon={<BriefcaseIcon className="w-6 h-6 text-purple-500" />}
+          trend="up"
+          description="85% completion rate"
+        /> */}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div className="border-2 my-4 p-4 rounded-lg">
+        <p className="text-left text-lg font-semibold">Todays Session info</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <InfoCard
+            title="Today Session"
+            value={todaySession.toString()}
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
+            trend="up"
+            description="2,500 new this month"
+          />
+          <InfoCard
+            title="Finished Session"
+            value={finishedSession.toString()}
+            icon={<ChartBarIcon className="w-6 h-6 text-green-500" />}
+            trend="up"
+            description="79% of total users"
+          />
+
+          <InfoCard
+            title="Upcoming Session"
+            value={upcomingSession.toString()}
+            icon={<CurrencyDollarIcon className="w-6 h-6 text-yellow-500" />}
+            trend="up"
+            description="$8,105 from in-app purchases"
+          />
+          <InfoCard
+            title="Current Session"
+            value={currentSession.toString()}
+            icon={<CurrencyDollarIcon className="w-6 h-6 text-yellow-500" />}
+            trend="up"
+            description="$8,105 from in-app purchases"
+          />
+        </div>
+      </div>
+
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <Card className="rounded-xl shadow-sm">
           <CardHeader className="flex flex-row items-center pt-4 justify-between">
             <div className="text-xl font-semibold">User Growth</div>
@@ -83,7 +210,6 @@ export default function DashboardPage() {
                   <SelectItem value="banana">Last 1 month</SelectItem>
                   <SelectItem value="blueberry">Last 6 month</SelectItem>
                   <SelectItem value="grapes">Last 1 year</SelectItem>
-                  {/* <SelectItem value="pineapple">Pineapple</SelectItem> */}
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -105,7 +231,6 @@ export default function DashboardPage() {
                   <SelectItem value="banana">Last 1 month</SelectItem>
                   <SelectItem value="blueberry">Last 6 month</SelectItem>
                   <SelectItem value="grapes">Last 1 year</SelectItem>
-                  {/* <SelectItem value="pineapple">Pineapple</SelectItem> */}
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -172,7 +297,7 @@ export default function DashboardPage() {
         <CardContent>
           <WorkerActivityChart />
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

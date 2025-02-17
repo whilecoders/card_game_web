@@ -6,6 +6,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { Icon } from "@iconify/react";
 import { toast } from "react-toastify";
 import { ApiCall } from "@/lib/api";
+import { useRouter } from "@/i18n/routing";
 
 type UserAccountCreateFieldType = {
   role: string;
@@ -28,6 +29,8 @@ export default function UserManagementCreateAccount({
 }) {
   const [isModalOpen, setModalOpen] = useState(false);
   const [form] = Form.useForm<UserAccountCreateFieldType>();
+
+  const router = useRouter();
 
   const handleClose = () => {
     onClose();
@@ -66,6 +69,7 @@ export default function UserManagementCreateAccount({
             role: role,
           },
         },
+        router: router,
       });
 
       // check for error

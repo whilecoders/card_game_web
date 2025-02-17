@@ -4,17 +4,7 @@ import UserManagementCreateAccount from "@/components/drawer/UserManagementCreat
 import UserManagementAccountDetails from "@/components/drawer/UserManagementAccountDetails";
 import { poppins } from "@/utils/fonts";
 import { Icon } from "@iconify/react";
-import {
-  Button,
-  DatePicker,
-  Dropdown,
-  Input,
-  MenuProps,
-  Select,
-  Space,
-  Table,
-  TableProps,
-} from "antd";
+import { Dropdown, MenuProps, Space, Table, TableProps } from "antd";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
@@ -23,9 +13,10 @@ import { toast } from "react-toastify";
 import { formateDate } from "@/lib/methods";
 import { useRouter } from "@/i18n/routing";
 import { Role } from "@/models/Game/game";
+import WorkerManagementUpdateToken from "@/components/drawer/WorkerManagementUpdateToken";
 
 export interface UserDataType {
-  id: string | number; // TODO: remove number according to requirement
+  id: string | number;
   username: string;
   role: string;
   wallet: number;
@@ -40,9 +31,7 @@ export default function Page() {
   const [page, setPage] = useState(1);
   const [count, setCount] = useState(0);
   const [selectedUser, setSelectedUser] = useState<undefined | UserDataType>();
-
-  const [nameFilter, setNameFilter] = useState<String | null>();
-  const [roleFiltre, setRoleFilter] = useState<Role | null>();
+  const [accountUpdateToken, setAccountUpdateToken] = useState<boolean>(false);
 
   const perPageData = 10;
 
@@ -52,7 +41,7 @@ export default function Page() {
 
   // Fetch ALl Users
   const { refetch } = useQuery({
-    queryKey: ["GetAllUser", page, roleFiltre, nameFilter],
+    queryKey: ["GetAllUser", page],
     queryFn: async () => {
       const response: ApiRespose = await ApiCall({
         query: `query SearchUser($userFiltersInput: UserFiltersInput!) {
@@ -66,6 +55,7 @@ export default function Page() {
       username,
       role,
       wallet,
+      wallet_limit,
       createdAt,
       phone_number
     }
@@ -75,14 +65,12 @@ export default function Page() {
           userFiltersInput: {
             take: perPageData,
             skip: (page - 1) * perPageData,
-            role: roleFiltre,
-            username: nameFilter,
+            role: "MASTER",
           },
         },
         router: router,
       });
 
-      console.log(response.data);
       if (!response.status) {
         // toast.error(response.message);
         setCount(0);
@@ -106,11 +94,11 @@ export default function Page() {
   const items: MenuProps["items"] = [
     {
       key: "1",
-      label: t("Removeuser"),
-    },
-    {
-      key: "2",
-      label: <span className="text-red-500">Block this user</span>,
+      label: "Update User Token",
+      onClick: () => {
+        console.log(selectedUser);
+        setAccountUpdateToken(true);
+      },
     },
   ];
 
@@ -158,6 +146,20 @@ export default function Page() {
       ),
     },
     {
+      title: "Token Limit",
+      dataIndex: "wallet_limit",
+      render: (d, user) => (
+        <div
+          onClick={() => {
+            setSelectedUser(user);
+            setAccountManageOpen(true);
+          }}
+        >
+          {d}
+        </div>
+      ),
+    },
+    {
       title: "Join Date",
       dataIndex: "createdAt",
       render: (d, user) => (
@@ -190,73 +192,27 @@ export default function Page() {
       key: "username",
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       render: (_, record) => (
-        <Dropdown
-          menu={{ items }}
-          trigger={["click"]}
-          placement="bottomRight"
-          transitionName=""
-        >
-          <Space size="middle">
-            <Icon
-              icon="material-symbols:more-vert"
-              className="cursor-pointer"
-            />
-          </Space>
-        </Dropdown>
+        <div onClick={() => setSelectedUser(record)}>
+          <Dropdown
+            menu={{ items }}
+            trigger={["click"]}
+            placement="bottomRight"
+            transitionName=""
+          >
+            <Space size="middle">
+              <Icon
+                icon="material-symbols:more-vert"
+                className="cursor-pointer"
+              />
+            </Space>
+          </Dropdown>
+        </div>
       ),
     },
   ];
 
   return (
     <div>
-      {/* Filter */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex gap-4 items-center w-full pt-4">
-        <Input
-          placeholder="Search"
-          style={{ width: 240 }}
-          onChange={async (e) => {
-            setNameFilter(e.target.value);
-          }}
-          className="border-transparent focus-within:border-primary"
-          prefix={<Icon icon="mdi-light:magnify" />}
-        />
-        <Select
-          placeholder="Role"
-          defaultValue={null}
-          style={{ width: 240 }}
-          onChange={async (e: Role) => {
-            setRoleFilter(e);
-            console.log(e);
-          }}
-          options={[
-            { value: null, label: "NONE" },
-            { value: "SUPERADMIN", label: "SUPER ADMIN" },
-            { value: "ADMIN", label: "ADMIN" },
-            { value: "USER", label: "USER" },
-          ]}
-          className="border-transparent"
-        />
-        {/* <DatePicker
-          style={{ width: 240 }}
-          // onChange={onChange} TODO: what to do on change
-          needConfirm={true}
-          placeholder="Date"
-        /> */}
-
-        <div className="hidden xl:block flex-1"></div>
-
-        <Button
-          type="primary"
-          className={`rounded-xl text ${poppins} text-base w-60 `}
-          icon={<Icon icon="material-symbols:add-circle-outline-rounded" />}
-          onClick={() => {
-            setAccountCreateOpen(true);
-          }}
-        >
-          Create Account
-        </Button>
-      </div>
-
       {/* Table */}
       <div className="overflow-scroll">
         <Table<UserDataType>
@@ -282,6 +238,13 @@ export default function Page() {
         open={accountManageOpen}
         setOpen={setAccountManageOpen}
         selectedUser={selectedUser}
+      />
+
+      {/* Update Token Drawer */}
+      <WorkerManagementUpdateToken
+        open={accountUpdateToken}
+        setOpen={setAccountUpdateToken}
+        userId={Number(selectedUser?.id ?? 0)}
       />
     </div>
   );

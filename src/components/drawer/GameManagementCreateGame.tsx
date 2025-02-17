@@ -14,9 +14,16 @@ import { Dispatch, SetStateAction, useState } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { ApiCall } from "@/lib/api";
-import { getCookie, getCookies, setCookie, deleteCookie, hasCookie } from 'cookies-next';
+import {
+  getCookie,
+  getCookies,
+  setCookie,
+  deleteCookie,
+  hasCookie,
+} from "cookies-next";
 import { toast } from "react-toastify";
 import { formatDateTime, formateDate } from "@/lib/methods";
+import { useRouter } from "@/i18n/routing";
 
 dayjs.extend(customParseFormat);
 
@@ -44,6 +51,8 @@ export default function GameManagementCreateGame({
   const [isModalOpen, setModalOpen] = useState(false);
   const [form] = Form.useForm<GameCreateFieldType>();
 
+  const router = useRouter();
+
   const handleClose = () => {
     onClose();
     setOpen(false);
@@ -66,12 +75,18 @@ export default function GameManagementCreateGame({
 
       // No Id in cookie
       if (Object.keys(user).length == 0) {
-        toast.error("Please login to create a game!");
-        return;
+        deleteCookie("access_token");
+        deleteCookie("refresh_token");
+        deleteCookie("user");
+        router.replace("/login");
       }
 
-      let startTime = new Date(start_time).toLocaleTimeString('en-US', { hour12: false });
-      let endTime = new Date(end_time).toLocaleTimeString('en-US', { hour12: false });
+      let startTime = new Date(start_time).toLocaleTimeString("en-US", {
+        hour12: false,
+      });
+      let endTime = new Date(end_time).toLocaleTimeString("en-US", {
+        hour12: false,
+      });
 
       const response = await ApiCall({
         query: `mutation ($createGamesDto: CreateGamesDto!) {
@@ -85,7 +100,7 @@ export default function GameManagementCreateGame({
               `,
         variables: {
           createGamesDto: {
-            admin_id: 1,
+            admin_id: user.id,
             start_date: formatDateTime(start_date),
             end_date: formatDateTime(end_date),
             start_time: startTime,
@@ -96,6 +111,7 @@ export default function GameManagementCreateGame({
             game_type: "KQJ",
           },
         },
+        router: router,
       });
 
       // check for error
@@ -128,7 +144,7 @@ export default function GameManagementCreateGame({
       </div>
 
       <Form
-        name="User Account Create"
+        name="Game Create"
         onFinish={handleCreateGameForm}
         form={form}
         initialValues={{ remember: true }}
@@ -139,7 +155,7 @@ export default function GameManagementCreateGame({
           name="start_date"
           rules={[{ required: true, message: "Please Select a Start Date!" }]}
         >
-          <DatePicker placeholder="Start Date" showTime className="w-full" />
+          <DatePicker placeholder="Start Date" className="w-full" />
         </Form.Item>
 
         <Form.Item<GameCreateFieldType>
@@ -162,7 +178,7 @@ export default function GameManagementCreateGame({
             }),
           ]}
         >
-          <DatePicker placeholder="End Date" showTime className="w-full" />
+          <DatePicker placeholder="End Date" className="w-full" />
         </Form.Item>
 
         <Form.Item<GameCreateFieldType>
@@ -172,6 +188,7 @@ export default function GameManagementCreateGame({
           <TimePicker
             placeholder="Start Time"
             defaultOpenValue={dayjs("00:00:00", "HH:mm:ss")}
+            needConfirm={false}
             className="w-full"
           />
         </Form.Item>
@@ -198,6 +215,7 @@ export default function GameManagementCreateGame({
         >
           <TimePicker
             placeholder="End Time"
+            needConfirm={false}
             defaultOpenValue={dayjs("00:00:00", "HH:mm:ss")}
             className="w-full"
           />

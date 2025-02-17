@@ -119,6 +119,7 @@ export default function UserManagementAccountDetails({
         userId={Number(selectedUser?.id ?? 0)}
       />
       <UserManagementManageAccount
+        selectedUser={selectedUser}
         open={accountManageUser}
         setOpen={setAccountManageUser}
       />
