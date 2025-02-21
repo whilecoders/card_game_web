@@ -294,7 +294,7 @@ function UserPermission({
           onChange={async (e) => {
             setNameFilter(e.target.value);
           }}
-          className="border-transparent focus-within:border-primary"
+          className="focus-within:border-primary"
           prefix={<Icon icon="mdi-light:magnify" />}
         />
         <Select

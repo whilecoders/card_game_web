@@ -1,0 +1,14 @@
+thead[class*="ant-table-thead"] th {
+  background-color: #e4e4e7 !important;
+}
+
+/* Add borders around the table cells */
+.ant-table td,
+.ant-table th {
+  border: 1px solid #d9d9d9; /* You can adjust the border color and style */
+}
+
+/* Optional: You can also add a border around the whole table */
+.ant-table {
+  border: 1px solid #d9d9d9;
+}

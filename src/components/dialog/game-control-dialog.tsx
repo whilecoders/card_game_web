@@ -680,11 +680,11 @@ export function GameControlDialog({
                       </div>
 
                       {result && (
-                        <div className="mt-4 p-4 bg-blue-100 dark:bg-blue-800 rounded-md">
-                          <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-200">
+                        <div className="mt-4 p-4 bg-blue-100 rounded-md">
+                          <h3 className="text-lg font-semibold text-blue-700">
                             Drawn Result
                           </h3>
-                          <p className="text-2xl font-bold text-blue-800 dark:text-blue-100">
+                          <p className="text-2xl font-bold text-blue-800">
                             {result}
                           </p>
                         </div>
@@ -692,9 +692,9 @@ export function GameControlDialog({
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900 dark:to-orange-900">
+                  <Card className="bg-gradient-to-br from-red-50 to-orange-50 ">
                     <CardHeader>
-                      <CardTitle className="text-2xl font-bold text-red-600 dark:text-red-300">
+                      <CardTitle className="text-2xl font-bold text-red-600">
                         End Game
                       </CardTitle>
                       <CardDescription>
@@ -702,19 +702,19 @@ export function GameControlDialog({
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="rounded-lg border-2 border-red-400 dark:border-red-600 p-4">
-                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                      <div className="rounded-lg border-2 border-red-400 ">
+                        <div className="flex items-center gap-2 text-red-600 ">
                           <AlertCircle className="h-5 w-5" />
                           <h3 className="font-semibold">Warning</h3>
                         </div>
-                        <p className="mt-2 text-sm text-red-700 dark:text-red-300">
+                        <p className="mt-2 text-sm text-red-700 ">
                           Ending the game immediately will stop all ongoing bets
                           and finalize the current state. This action cannot be
                           undone.
                         </p>
                         <Button
                           variant="destructive"
-                          className="mt-4 w-full bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+                          className="mt-4 w-full bg-red-600 hover:bg-red-700 "
                           onClick={handleEndGame}
                         >
                           End Game Immediately

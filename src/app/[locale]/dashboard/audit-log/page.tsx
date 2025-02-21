@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 import { formateDate } from "@/lib/methods";
 import { useRouter } from "@/i18n/routing";
 import { Role } from "@/models/Game/game";
-import "./index.css";
 
 export interface AuditLogType {
   id: number;
@@ -195,7 +194,6 @@ export default function Page() {
           columns={columns}
           dataSource={auditLog}
           rowKey="username"
-          bordered={true}
           pagination={{
             pageSize: perPageData,
             total: count,

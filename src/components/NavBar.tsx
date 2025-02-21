@@ -143,7 +143,10 @@ export function NavBar() {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="default" className="relative h-8 w-8 rounded-full">
+          <Button
+            variant="default"
+            className="relative h-8 w-8 rounded-full bg-transparent hover:bg-transparent"
+          >
             <Avatar className="h-8 w-8 grid place-items-center bg-blue-500 text-white font-bold text-xl">
               <span>
                 {loggedInUser?.username?.at(0)?.toUpperCase() ?? "--"}

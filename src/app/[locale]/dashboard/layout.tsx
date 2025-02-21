@@ -52,6 +52,7 @@ import { getCookie, setCookie } from "cookies-next";
 import { Sidebar } from "@/components/SideBar";
 import { useEffect, useState } from "react";
 import { useRouter } from "@/i18n/routing";
+import "./index.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
