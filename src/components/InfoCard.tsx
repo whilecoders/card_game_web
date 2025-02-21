@@ -19,7 +19,7 @@ export function InfoCard({
   description,
 }: InfoCardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-md p-5 transition-all duration-300 hover:shadow-lg">
+    <div className="bg-white rounded-xl shadow-md p-5 transition-all duration-300 hover:shadow-lg border">
       <div className="flex justify-between items-start mb-3">
         <div>
           <h3 className="text-sm font-semibold text-gray-700">{title}</h3>

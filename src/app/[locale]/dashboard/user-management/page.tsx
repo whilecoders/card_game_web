@@ -51,7 +51,7 @@ export default function Page() {
   const router = useRouter();
 
   // Fetch ALl Users
-  const { refetch } = useQuery({
+  const { refetch, isLoading } = useQuery({
     queryKey: ["GetAllUser", page, roleFiltre, nameFilter],
     queryFn: async () => {
       const response: ApiRespose = await ApiCall({
@@ -207,7 +207,13 @@ export default function Page() {
     },
   ];
 
-  return (
+  return isLoading ? (
+    <>
+      <div className="h-screen w-full bg-white grid place-items-center">
+        <p className="text-xl font-semibold text-slate-800">Loading...</p>
+      </div>
+    </>
+  ) : (
     <div>
       {/* Filter */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex gap-4 items-center w-full pt-4">
