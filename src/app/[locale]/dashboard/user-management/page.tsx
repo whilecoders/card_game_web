@@ -258,7 +258,7 @@ export default function Page() {
       </div>
 
       {/* Table */}
-      <div className="overflow-scroll">
+      <div className="overflow-scroll my-4">
         <Table<UserDataType>
           columns={columns}
           dataSource={userData}

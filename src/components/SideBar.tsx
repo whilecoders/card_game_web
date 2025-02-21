@@ -23,7 +23,7 @@ export function Sidebar({ className }: SidebarProps) {
               onClick={(e) => route.replace("/dashboard")}
               variant={
                 path.split("?").at(0)?.endsWith("/dashboard")
-                  ? "secondary"
+                  ? "default"
                   : "ghost"
               }
               className="flex justify-start relative"
@@ -47,7 +47,7 @@ export function Sidebar({ className }: SidebarProps) {
               onClick={(e) => route.replace("/dashboard/user-management")}
               variant={
                 path.split("?").at(0)?.endsWith("/dashboard/user-management")
-                  ? "secondary"
+                  ? "default"
                   : "ghost"
               }
               className=" justify-start relative"
@@ -70,7 +70,7 @@ export function Sidebar({ className }: SidebarProps) {
               <div className=" absolute left-12">Users</div>
             </Button>
             <Button
-              variant={path === "" ? "secondary" : "ghost"}
+              variant={path === "" ? "default" : "ghost"}
               className="relative justify-start"
             >
               <svg
@@ -103,7 +103,7 @@ export function Sidebar({ className }: SidebarProps) {
               onClick={() => route.replace("/dashboard/game-management")}
               variant={
                 path.split("?").at(0)?.endsWith("/dashboard/game-management")
-                  ? "secondary"
+                  ? "default"
                   : "ghost"
               }
               className="flex justify-start relative"
@@ -127,7 +127,7 @@ export function Sidebar({ className }: SidebarProps) {
               onClick={() => route.replace("/dashboard/workers")}
               variant={
                 path.split("?").at(0)?.endsWith("/dashboard/workers")
-                  ? "secondary"
+                  ? "default"
                   : "ghost"
               }
               className=" justify-start relative"
@@ -150,7 +150,12 @@ export function Sidebar({ className }: SidebarProps) {
               <div className=" absolute left-12">Worker</div>
             </Button>
             <Button
-              variant={path === "" ? "secondary" : "ghost"}
+              onClick={() => route.replace("/dashboard/audit-log")}
+              variant={
+                path.split("?").at(0)?.endsWith("/dashboard/audit-log")
+                  ? "default"
+                  : "ghost"
+              }
               className="relative justify-start"
             >
               <svg
@@ -175,7 +180,7 @@ export function Sidebar({ className }: SidebarProps) {
               onClick={() => route.replace("/dashboard/permission")}
               variant={
                 path.split("?").at(0)?.endsWith("/dashboard/permission")
-                  ? "secondary"
+                  ? "default"
                   : "ghost"
               }
               className="relative justify-start"
