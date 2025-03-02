@@ -45,8 +45,8 @@ export default function Page() {
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
     // Api call to login user
     const response = await ApiCallWihtoutToken({
-      query: `query signIn($signInCredential:SignInCredential!) {
-        signIn(signInCredential: $signInCredential) {
+      query: `query SignInAdmin($signInCredential:SignInCredential!) {
+        signInAdmin(signInCredential: $signInCredential) {
         access_token,
           refresh_token,
           user {
@@ -56,6 +56,7 @@ export default function Page() {
           }
         }
       }`,
+
       variables: {
         signInCredential: {
           username: data.username.trim(),
@@ -72,7 +73,7 @@ export default function Page() {
       return;
     }
 
-    const { access_token, refresh_token, user } = response.data.signIn;
+    const { access_token, refresh_token, user } = response.data.signInAdmin;
 
     // save in cookie
     const cookieOptions = { path: "/" };

@@ -65,7 +65,7 @@ export default function UserManagementManageAccount({
     })();
   }, []);
 
-  const BlockUserConfirm = () => {
+  const BlockUserConfirm = async () => {
     blockUserConfirmModal.confirm({
       title: "Are you sure?",
       content: "Blocking this user will restrict their access to all games.",
@@ -74,8 +74,33 @@ export default function UserManagementManageAccount({
       okButtonProps: {
         danger: true,
       },
-      onOk: () => {
-        /* TODO: add action */
+      onOk: async () => {
+        try {
+          const response = await ApiCall({
+            query: `mutation SuspendUser($suspendUserDto: SuspendUserDto!) {
+              suspendUser(suspendUserDto: $suspendUserDto) {
+                id
+                email
+                phone_number
+              }
+            }`,
+            variables: {
+              suspendUserDto: {
+                userId: selectedUser?.id,
+              },
+            },
+            router: undefined,
+          });
+
+          if (!response.status) {
+            toast.error(response.message);
+            return;
+          }
+
+          toast.success("User has been blocked successfully!");
+        } catch (error) {
+          toast.error("An error occurred while blocking the user.");
+        }
       },
     });
   };

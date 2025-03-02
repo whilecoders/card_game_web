@@ -133,7 +133,7 @@ export default function Permission() {
 }
 
 export interface UserDataType {
-  id: string | number; // TODO: remove number according to requirement
+  id: number; // TODO: remove number according to requirement
   username: string;
   role: string;
   wallet: number;
