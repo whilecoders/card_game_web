@@ -245,56 +245,42 @@ const PaneTwo = () => {
     <div className="w-full">
       <section className="flex items-end justify-between">
         <div className="flex gap-3">
-          <InfoCard
-            title="Heart"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           />
-          <InfoCard
-            title="Brick"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
-          />{" "}
-          <InfoCard
-            title="Spade"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
-          />{" "}
-          <InfoCard
-            title="Tree"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
+          />
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
+          />
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           />
         </div>
         <div className="flex gap-4">
-          <InfoCard
-            title="King"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           />{" "}
-          <InfoCard
-            title="Queen"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           />{" "}
-          <InfoCard
-            title="Joker"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           />
         </div>
       </section>
@@ -327,56 +313,42 @@ const PaneThree = () => {
     <div className="w-full">
       <section className="flex items-end justify-between">
         <div className="flex gap-3">
-          <InfoCard
-            title="Heart"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           />
-          <InfoCard
-            title="Brick"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
-          />{" "}
-          <InfoCard
-            title="Spade"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
-          />{" "}
-          <InfoCard
-            title="Tree"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
+          />
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
+          />
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           />
         </div>
         <div className="flex gap-4">
-          <InfoCard
-            title="King"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           />{" "}
-          <InfoCard
-            title="Queen"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           />{" "}
-          <InfoCard
-            title="Joker"
-            value={"123"}
-            icon={<Icon icon="material-symbols:10k" width="24" height="24" />}
-            trend="up"
-            description="79% of total users"
+          <GameResultCard
+            stats={12000}
+            title="20"
+            icon={<UsersIcon className="w-6 h-6 text-blue-500" />}
           />
         </div>
       </section>
