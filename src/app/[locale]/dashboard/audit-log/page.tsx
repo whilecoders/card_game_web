@@ -189,7 +189,7 @@ export default function Page() {
       </div>
 
       {/* Table */}
-      <div className="overflow-scroll my-4">
+      <div className="overflow-auto my-4">
         <Table<AuditLogType>
           columns={columns}
           dataSource={auditLog}

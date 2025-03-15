@@ -13,6 +13,7 @@ import {
   Select,
   Space,
   Table,
+  TableColumnsType,
   TableProps,
 } from "antd";
 import { useState } from "react";
@@ -56,21 +57,21 @@ export default function Page() {
     queryFn: async () => {
       const response: ApiRespose = await ApiCall({
         query: `query SearchUser($userFiltersInput: UserFiltersInput!) {
-  searchUser(UserFiltersInput: $userFiltersInput) {
-    count,
-    skip,
-    take,
-    data {
-      id,
-      name,
-      username,
-      role,
-      wallet,
-      createdAt,
-      phone_number
-    }
-  }
-}`,
+          searchUser(UserFiltersInput: $userFiltersInput) {
+            count,
+            skip,
+            take,
+            data {
+              id,
+              name,
+              username,
+              role,
+              wallet,
+              createdAt,
+              phone_number
+            }
+          }
+        }`,
         variables: {
           userFiltersInput: {
             take: perPageData,
@@ -114,7 +115,21 @@ export default function Page() {
     },
   ];
 
-  const columns: TableProps<UserDataType>["columns"] = [
+  const columns: TableColumnsType<UserDataType> = [
+    {
+      title: "Id",
+      dataIndex: "id",
+      render: (d, user) => (
+        <div
+          onClick={() => {
+            setSelectedUser(user);
+            setAccountManageOpen(true);
+          }}
+        >
+          {d}
+        </div>
+      ),
+    },
     {
       title: "Username",
       dataIndex: "username",
@@ -264,7 +279,7 @@ export default function Page() {
       </div>
 
       {/* Table */}
-      <div className="overflow-scroll my-4">
+      <div className="overflow-auto my-4">
         <Table<UserDataType>
           columns={columns}
           dataSource={userData}

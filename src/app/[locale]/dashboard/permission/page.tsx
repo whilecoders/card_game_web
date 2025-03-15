@@ -151,12 +151,10 @@ function UserPermission({
   const [userData, setUserData] = useState<UserDataType[]>([]);
   const [page, setPage] = useState(1);
   const [count, setCount] = useState(0);
-
   const [nameFilter, setNameFilter] = useState<String | null>();
   const [roleFiltre, setRoleFilter] = useState<Role | null>();
 
   const perPageData = 5;
-
   const router = useRouter();
 
   // Fetch ALl Users
@@ -322,7 +320,7 @@ function UserPermission({
 
       <div className="hidden xl:block flex-1"></div>
       {/* Table */}
-      <div className="overflow-scroll my-4">
+      <div className="overflow-auto my-4">
         <Table<UserDataType>
           columns={columns}
           dataSource={userData}

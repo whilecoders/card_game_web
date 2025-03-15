@@ -14,7 +14,7 @@ type UserAccountCreateFieldType = {
   password: string;
   confirmPassword: string;
   phone: number;
-  email: string;
+  email?: string;
   city: string;
 };
 
@@ -32,6 +32,10 @@ export default function UserManagementCreateAccount({
 
   const router = useRouter();
 
+  const handleOk = () => {
+    
+  }
+
   const handleClose = () => {
     onClose();
     setOpen(false);
@@ -46,7 +50,6 @@ export default function UserManagementCreateAccount({
         isoCode: string;
         phoneNumber: string;
       } = values.phone as any;
-
       const phoneNumber = `${phoneDetails.areaCode}${phoneDetails.phoneNumber}`;
 
       if (confirmPassword != password) {
@@ -62,7 +65,7 @@ export default function UserManagementCreateAccount({
         variables: {
           addUserDto: {
             city,
-            email,
+            email: email ?? null,
             password,
             username,
             phone_number: phoneNumber,
@@ -164,14 +167,7 @@ export default function UserManagementCreateAccount({
           label=""
           name="email"
           rules={[
-            {
-              required: true,
-              message: "Email is required",
-            },
-            {
-              type: "email",
-              message: "Please enter a valid email address",
-            },
+            { type: "email", message: "Please enter a valid email address" },
             {
               validator: (_, value) => {
                 const emailRegEx =
@@ -277,3 +273,4 @@ export default function UserManagementCreateAccount({
     </Drawer>
   );
 }
+

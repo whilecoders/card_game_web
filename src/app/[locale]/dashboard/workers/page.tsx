@@ -32,11 +32,7 @@ export default function Page() {
   const [count, setCount] = useState(0);
   const [selectedUser, setSelectedUser] = useState<undefined | UserDataType>();
   const [accountUpdateToken, setAccountUpdateToken] = useState<boolean>(false);
-
   const perPageData = 10;
-
-  const t = useTranslations("UserManagement");
-
   const router = useRouter();
 
   // Fetch ALl Users
@@ -45,22 +41,22 @@ export default function Page() {
     queryFn: async () => {
       const response: ApiRespose = await ApiCall({
         query: `query SearchUser($userFiltersInput: UserFiltersInput!) {
-  searchUser(UserFiltersInput: $userFiltersInput) {
-    count,
-    skip,
-    take,
-    data {
-      id,
-      name,
-      username,
-      role,
-      wallet,
-      wallet_limit,
-      createdAt,
-      phone_number
-    }
-  }
-}`,
+          searchUser(UserFiltersInput: $userFiltersInput) {
+            count,
+            skip,
+            take,
+            data {
+              id,
+              name,
+              username,
+              role,
+              wallet,
+              wallet_limit,
+              createdAt,
+              phone_number
+            }
+          }
+        }`,
         variables: {
           userFiltersInput: {
             take: perPageData,
@@ -214,7 +210,7 @@ export default function Page() {
   return (
     <div>
       {/* Table */}
-      <div className="overflow-scroll">
+      <div className="overflow-auto">
         <Table<UserDataType>
           columns={columns}
           dataSource={userData}

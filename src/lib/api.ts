@@ -198,11 +198,11 @@ export async function ApiCall(
 
   const validateRefreshTokenResponse = await ApiCallWihtoutToken({
     query: `mutation Mutation($refreshToken: String!, $token: String!) {
-  refreshAccessToken(refreshToken: $refreshToken, token: $token) {
-  access_token,
-  refresh_token  
-  }
-}`,
+      refreshAccessToken(refreshToken: $refreshToken, token: $token) {
+      access_token,
+      refresh_token  
+      }
+    }`,
     variables: { refreshToken: refresh_token, token: token },
     headers: args.headers,
     router: args.router,
