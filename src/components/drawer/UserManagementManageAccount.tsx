@@ -1,4 +1,4 @@
-import { UserDataType } from "@/app/[locale]/dashboard/permission/page";
+import { UserDataType } from "@/app/[locale]/dashboard/user-management/page";
 import { useRouter } from "@/i18n/routing";
 import { ApiCall } from "@/lib/api";
 import { getUserIdOfLoginUser } from "@/lib/methods";
@@ -235,7 +235,7 @@ export default function UserManagementManageAccount({
      
       {contextHolder}
       <TransactionPasswordContent
-        selectedUserId={selectedUser?.id ?? 0}
+        selectedUserId={Number(selectedUser?.id ?? "0")}
         amount={tokenInput.current?.value ?? 0}
         updateToken={tokeUpdateStatus}
         openTransactinoPassword={openTransactinoPassword}
