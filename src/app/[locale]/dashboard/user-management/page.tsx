@@ -83,7 +83,6 @@ export default function Page() {
         router: router,
       });
 
-      console.log(response.data);
       if (!response.status) {
         // toast.error(response.message);
         setCount(0);
