@@ -86,3 +86,31 @@ export interface DailyGame {
   games: Games;
   // Add fields as per your schema
 }
+
+
+
+// enum GameKqjCards {
+//   JACK_OF_SPADES = 'JACK_OF_SPADES',
+//   QUEEN_OF_SPADES = 'QUEEN_OF_SPADES',
+//   KING_OF_SPADES = 'KING_OF_SPADES',
+//   JACK_OF_HEARTS = 'JACK_OF_HEARTS',
+//   QUEEN_OF_HEARTS = 'QUEEN_OF_HEARTS',
+//   KING_OF_HEARTS = 'KING_OF_HEARTS',
+//   JACK_OF_DIAMONDS = 'JACK_OF_DIAMONDS',
+//   QUEEN_OF_DIAMONDS = 'QUEEN_OF_DIAMONDS',
+//   KING_OF_DIAMONDS = 'KING_OF_DIAMONDS',
+//   JACK_OF_CLUBS = 'JACK_OF_CLUBS',
+//   QUEEN_OF_CLUBS = 'QUEEN_OF_CLUBS',
+//   KING_OF_CLUBS = 'KING_OF_CLUBS',
+//   KING = 'KING',
+//   QUEEN = 'QUEEN',
+//   JACK = 'JACK',
+//   SPADES = 'SPADES',
+//   HEARTS = 'HEARTS',
+//   DIAMONDS = 'DIAMONDS',
+//   CLUBS = 'CLUBS',
+// }
+
+
+
+// export { GameKqjCards };

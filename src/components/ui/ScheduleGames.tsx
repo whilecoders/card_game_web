@@ -78,8 +78,7 @@ const ScheduledGames: React.FC = () => {
     let response: ApiResponse | undefined = undefined;
     try {
       response = await ApiCall({
-        query: `       
-         query getGamesByDateOrToday {
+        query: `query getGamesByDateOrToday {
           getGamesByDateOrToday {
             id,
             game_duration,
@@ -252,7 +251,7 @@ const ScheduledGames: React.FC = () => {
         </div>
         <RangePicker />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="md:flex grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
           <> Loading... </>
         ) : (

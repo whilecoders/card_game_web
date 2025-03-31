@@ -58,6 +58,8 @@ export default function GameManagementCreateGame({
     setOpen(false);
   };
 
+  
+
   const handleCreateGameForm: FormProps<GameCreateFieldType>["onFinish"] =
   async (values) => {
     const {
@@ -72,6 +74,9 @@ export default function GameManagementCreateGame({
     //   Get admin id from cookie
     const userJSON = getCookie("user") ?? "{}";
     const user = JSON.parse(userJSON);
+
+    console.log("game_in_day", typeof game_in_day);
+    console.log("game_duration", typeof game_duration);
 
     // No Id in cookie
     if (Object.keys(user).length == 0) {
@@ -105,7 +110,7 @@ export default function GameManagementCreateGame({
           end_date: formatDateTime(end_date),
           start_time: startTime,
           end_time: endTime,
-          game_duration,
+          game_duration: Number(game_duration),
           game_in_day,
           game_status: "AVAILABLE",
           game_type: "KQJ",
@@ -117,6 +122,7 @@ export default function GameManagementCreateGame({
     // check for error
     if (response.status == false) {
       toast.error(response.message);
+      console.error(response.message);
       return;
     }
 
@@ -138,7 +144,6 @@ export default function GameManagementCreateGame({
     let gameInDays = ( diffInMilliseconds / 1000 ) / 60; // convert milliseconds to minutes
     gameInDays = gameInDays / game_duration;  // finding game in days by dividing total minutes by game duration
     gameInDays = Math.ceil(gameInDays); 
-    
     form.setFieldValue("game_in_day", gameInDays);
   }
 
@@ -246,19 +251,16 @@ export default function GameManagementCreateGame({
           name="game_duration"
           rules={[
             { required: true, message: "Please Select a Game Duration!" },
-            {
-              validator(_, value) {
+            { validator(_, value) {
                 if (value <= 0) {
                   return Promise.reject(
                     new Error("Game Duration must be greater than zero")
                   );
                 }
-                return Promise.resolve();
-              },
-            },  
+                return Promise.resolve(); }, },  
           ]}
         >
-          <Input onChange={calculateGameInDay} placeholder="Game Duration (in minutes)" className="w-full" />
+          <Input type="number" onChange={calculateGameInDay} placeholder="Game Duration (in minutes)" className="w-full" />
         </Form.Item>
 
         <Form.Item<GameCreateFieldType>

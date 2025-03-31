@@ -28,8 +28,8 @@ export enum RecordStatus {
 export enum TokenValues {
   TOKEN_11 = 11,
   TOKEN_55 = 55,
-  TOKEN_110 = 110,
   TOKEN_550 = 550,
+  TOKEN_110 = 110,
   TOKEN_1100 = 1100,
   TOKEN_5500 = 5500,
 }
