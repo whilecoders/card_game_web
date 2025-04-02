@@ -371,7 +371,7 @@ export default function Page() {
               value={filterStatus}
             >
               <SelectTrigger className="w-[14%]">
-                <SelectValue placeholder="Filter by Status" />
+                <SelectValue className="border-gray-300" placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
@@ -508,7 +508,7 @@ const GameSession = (probs: GameSessionRowType) => {
   return (
     <>
       {gameSessions.map((session: GameSessionKqj, index: number) => (
-        <TableRow key={index} onClick={(e) => probs.onTap(session)}>
+        <TableRow className="bg-[#fafafa]" key={index} onClick={(e) => probs.onTap(session)}>
           <TableCell className="text-center">
             {new Date(session.session_start_time ?? "--").toLocaleString() ||
               "--"}

@@ -230,7 +230,7 @@ const ScheduledGames: React.FC = () => {
 
   return (
     <div className="p-5 pb-9">
-      <h2 className="text-2xl font-semibold mb-4 text-primary">
+      <h2 className="text-2xl font-semibold mb-4 text-black">
         Scheduled Games
       </h2>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -258,11 +258,11 @@ const ScheduledGames: React.FC = () => {
           filteredGames.map((game: Games) => (
             <Card
               key={game.id}
-              className="w-[400px] bg-card overflow-hidden transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
+              className="w-[400px] bg-white overflow-hidden transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
             >
-              <CardHeader className="bg-primary/5 p-0 py-3">
+              <CardHeader className="bg-[#f3f3f3] p-0 py-3">
                 <CardTitle className="flex justify-between items-center text-lg gap-4">
-                  <span className="text-primary font-semibold">
+                  <span className="text-black font-semibold">
                     Game #{game.id}
                   </span>
                   <Badge variant="default" color="grey" className="font-normal">
@@ -273,14 +273,14 @@ const ScheduledGames: React.FC = () => {
               <CardContent className="pt-4">
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
-                    <CalendarDays className="w-4 h-4 text-primary" />
+                    <CalendarDays className="w-4 h-4 text-black" />
                     <span className="text-sm">
                       {new Date(game.start_date).toLocaleDateString()} to{" "}
                       {new Date(game.end_date).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-primary" />
+                    <Clock className="w-4 h-4 text-black" />
                     <span className="text-sm">
                       {game.start_time} - {game.end_time}{" "}
                       <span className="font-medium">
@@ -289,7 +289,7 @@ const ScheduledGames: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4 text-primary" />
+                    <User className="w-4 h-4 text-black" />
                     <span className="text-sm">
                       Created by{" "}
                       <span className="font-medium">{game.createdBy}</span> on{" "}
@@ -297,7 +297,7 @@ const ScheduledGames: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Hash className="w-4 h-4 text-primary" />
+                    <Hash className="w-4 h-4 text-black" />
                     <span className="text-sm">
                       Game ID: <span className="font-medium">{game.id}</span>
                     </span>

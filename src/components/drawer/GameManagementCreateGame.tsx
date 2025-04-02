@@ -75,9 +75,6 @@ export default function GameManagementCreateGame({
     const userJSON = getCookie("user") ?? "{}";
     const user = JSON.parse(userJSON);
 
-    console.log("game_in_day", typeof game_in_day);
-    console.log("game_duration", typeof game_duration);
-
     // No Id in cookie
     if (Object.keys(user).length == 0) {
       deleteCookie("access_token");
@@ -95,24 +92,24 @@ export default function GameManagementCreateGame({
 
     const response = await ApiCall({
       query: `mutation ($createGamesDto: CreateGamesDto!) {
-              createGames(createGamesDto: $createGamesDto) {
-                start_time,
-                end_time,
-                game_duration,
-                id
-              }
-            }
-            `,
+        createGames(createGamesDto: $createGamesDto) {
+          start_time,
+          end_time,
+          game_duration,
+          id
+        }
+      }
+      `,
       variables: {
         createGamesDto: {
           admin_id: user.id,
-          start_date: formatDateTime(start_date),
-          end_date: formatDateTime(end_date),
           start_time: startTime,
-          end_time: endTime,
-          game_duration: Number(game_duration),
-          game_in_day,
           game_status: "AVAILABLE",
+          end_date: formatDateTime(end_date),
+          start_date: formatDateTime(start_date),
+          game_duration: Number(game_duration) * 60,
+          game_in_day,
+          end_time: endTime,
           game_type: "KQJ",
         },
       },

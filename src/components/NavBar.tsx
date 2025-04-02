@@ -111,11 +111,10 @@ export function NavBar() {
 
       <div className="flex items-center gap-2">
         <Icon icon="lucide:box" className="h-8 w-8 text-primary" />
-        <h1 className={`text-2xl font-bold ${inter.className}`}>JQK</h1>
+        <h1 className={`text-2xl font-bold ${inter.className}`}>King X Bet</h1>
       </div>
 
       {/* <Breadcrumb className="hidden md:flex" /> */}
-
       <div className="flex-1"></div>
 
       {/* <Button

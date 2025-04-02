@@ -8,7 +8,8 @@ import { Button, Drawer, Input, InputNumber, Modal, Tag } from "antd";
 import { getCookie } from "cookies-next";
 import { ChangeEvent, ChangeEventHandler, Dispatch, EventHandler, SetStateAction, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import TransactionPasswordContent from "../dialog/TransactionPasswordVerification";
+import SetTransactionPassword from "../dialog/SetTransactionPassword";
+import VerifyTransactionPasswordModel from "../dialog/VerifyTransactionPassword";
 
 export type UpdateTokenPayload = { updateType: "add" | "remove" };
 
@@ -231,14 +232,14 @@ export default function UserManagementManageAccount({
           Block This User
         </Button>
       </div>
-      {/*  --- transaction password modal --- */}
      
+      {/*  --- transaction password modal --- */}
       {contextHolder}
-      <TransactionPasswordContent
+      <VerifyTransactionPasswordModel
+        openTransactinoPassword={openTransactinoPassword}
         selectedUserId={Number(selectedUser?.id ?? "0")}
         amount={tokenInput.current?.value ?? 0}
         updateToken={tokeUpdateStatus}
-        openTransactinoPassword={openTransactinoPassword}
         onChancel={e => {
           setOpenTransactinoPassword(false); 
           setTokeUpdateStatus(undefined);
