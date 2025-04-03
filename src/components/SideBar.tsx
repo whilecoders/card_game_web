@@ -56,7 +56,7 @@ export function Sidebar({ className }: SidebarProps) {
   if (error.length) return <div>{error}</div>;
 
   return (
-    <div className={cn("pb-12", className)}>
+    <div className={cn("pb-12 hidden lg:flex", className)}>
       <div className="space-y-4 py-4 pb-2 w-72">
         {sidebarItems.map((group, idx) => {
           if (!userRole) return <></>;
@@ -110,7 +110,7 @@ type SidebarGroupType = {
   data: SidebarItemType[];
 };
 
-const sidebarItems: SidebarGroupType[] = [
+export const sidebarItems: SidebarGroupType[] = [
   {
     title: "Dashboard",
     enabledFor: ["admin", "superadmin", "master"],

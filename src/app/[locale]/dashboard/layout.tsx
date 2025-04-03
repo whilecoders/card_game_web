@@ -71,7 +71,7 @@ export default function Layout({
       <div className={`min-h-screen bg-background  ${inter.className}`}>
         <NavBar />
         <div className="flex  h-[calc(100vh-4rem)]">
-          { /* <Sidebar className="bg-white border-r-2 border-r-gray-400" /> */}
+          <Sidebar className="bg-white border-r-2 border-r-gray-400" />
           <main className="flex-1 bg-[#f9f8fd] overflow-auto p-6">
             {children}
           </main>
