@@ -299,7 +299,7 @@ export const sidebarItems: SidebarGroupType[] = [
         ),
       },
       {
-        title: "Result",
+        title: "Statement",
         url: "/dashboard/result",
         enabledFor: ["admin", "superadmin"],
         icon: (
