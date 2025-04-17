@@ -363,15 +363,15 @@ export default function Page() {
             placeholder="Date"
           />
         </div>
-        <div className="flex gap-4 items-center justify-start bg-white p-4 rounded-md shadow">
-          <Filter className="text-gray-400" />
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-start bg-white p-4 rounded-md shadow">
+          <Filter className="hidden md:block text-gray-400" />
           <div className="w-1/4">
             <Select
               onValueChange={(value) => handleFilter("STATUS", value)}
               value={filterStatus}
             >
-              <SelectTrigger className="w-[14%]">
-                <SelectValue className="border-gray-300" placeholder="Filter by Status" />
+              <SelectTrigger className="md:w-[100%] w-[20rem]">
+                <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
@@ -385,7 +385,7 @@ export default function Page() {
               onValueChange={(value) => handleFilter("RESULT", value)}
               value={filtersResult}
             >
-              <SelectTrigger className="w-[14%]">
+              <SelectTrigger className="md:w-[100%] w-[20rem]">
                 <SelectValue
                   placeholder="Filter by Result"
                   className=" placeholder:bg-zinc-100"
@@ -418,7 +418,7 @@ export default function Page() {
             </Button>
           )}
           <div className="grow"></div>
-          <div className="flex items-center w-[20%] space-x-2">
+          <div className="flex items-center w-[100%] space-x-2">
             <Filter className="text-gray-400 " />
             <div className="flex items-center h-9">
               <Input
